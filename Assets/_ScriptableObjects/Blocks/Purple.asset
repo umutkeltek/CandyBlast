@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c09aa37fd3346748ac4ac7b84049cd5, type: 3}
   m_Name: Purple
   m_EditorClassIdentifier: 
+  id: 3
   candyName: Purple
   defaultCandySprite: {fileID: 21300000, guid: 72095922b469be84dbd64fe098c23852, type: 3}
   level1CandySprite: {fileID: 21300000, guid: 1c474c533a534534ca93d65918642534, type: 3}

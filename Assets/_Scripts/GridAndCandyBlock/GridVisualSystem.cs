@@ -19,7 +19,7 @@ public class GridVisualSystem : MonoBehaviour
     [SerializeField] private Transform pfGlassGridVisual;
     [SerializeField] private Transform pfBackgroundGridVisual; //it will be used if it is wanted to add a background to the grid
     [SerializeField] private Transform cameraTransform;
-    [SerializeField] private GridLogicSystem gridLogicSystem;
+    [SerializeField] public GridLogicSystem gridLogicSystem;
 
     private GridXY<CandyGridCellPosition> grid;
     private Dictionary<CandyOnGridCell, CandyGridVisual> candyGridDictionary;
@@ -50,7 +50,7 @@ public class GridVisualSystem : MonoBehaviour
         this.grid = grid;
         
         float cameraYOffset = 1f;
-        cameraTransform.position = new Vector3(grid.GetColumnsCount() * .5f, grid.GetRowsCount() * .5f + cameraYOffset, cameraTransform.position.z);
+        //cameraTransform.position = new Vector3(grid.GetColumnsCount() * .5f, grid.GetRowsCount() * .5f + cameraYOffset, cameraTransform.position.z);
         
         gridLogicSystem.OnCandyGridPositionDestroyed += GridLogicSystem_OnCandyGridPositionDestroyed;
         gridLogicSystem.OnNewCandyGridSpawned += GridLogicSystem_OnNewCandyGridSpawned;
@@ -71,9 +71,9 @@ public class GridVisualSystem : MonoBehaviour
                 
                 //VisualTransform
                 Transform candyGridVisualTransform = Instantiate(pfCandyGridVisual, position, Quaternion.identity);
-                candyGridVisualTransform.Find("sprite").GetComponent<SpriteRenderer>().sprite = candyOnGridCell.GetCandyBlock().defaultCandySprite;
+                candyGridVisualTransform.Find("sprite").GetComponent<SpriteRenderer>().sprite = candyOnGridCell.GetCandyBlockSO().defaultCandySprite;
                 candyGridVisualTransform.Find("sprite").GetComponent<SpriteRenderer>().sortingOrder = y;
-                CandyGridVisual candyGridVisual = new CandyGridVisual(candyGridVisualTransform, candyOnGridCell);
+                CandyGridVisual candyGridVisual = new CandyGridVisual(candyGridVisualTransform, candyOnGridCell,gridLogicSystem);
                 
                 candyGridDictionary[candyOnGridCell] = candyGridVisual;
                 
@@ -86,7 +86,7 @@ public class GridVisualSystem : MonoBehaviour
             }
         }
 
-        SetBusyState(0.5f, () => SetState(State.TryFindMatches));
+        SetBusyState(0.1f, () => SetState(State.TryFindMatches));
         isSetup= true;
 
     }
@@ -105,7 +105,57 @@ public class GridVisualSystem : MonoBehaviour
         position = new Vector3(position.x,position.y);
         Transform candyGridVisualTransform = Instantiate(pfCandyGridVisual, position, Quaternion.identity);
     }
-    
+
+    private void Update()
+    {
+        if (!isSetup) { return; }
+        UpdateVisual();
+
+        switch (state)
+        {
+            case State.Busy:
+                busyTimer -= Time.deltaTime;
+                if (busyTimer <= 0f)
+                {
+                    onBusyTimerElapsedAction();
+                }
+                break;
+            case State.WaitingForPlayer:
+                break;
+            case State.TryFindMatches:
+                /*if (gridLogicSystem.TryFindMatches())
+                {
+                    SetBusyState(0.1f, () => SetState(State.WaitingForPlayer));
+                }
+                else
+                {
+                    SetState(State.WaitingForPlayer);
+                }*/
+                break;
+            case State.GameOver:
+                break;
+        }
+
+        if (Input.GetMouseButtonDown(0))
+        {   Vector3 mousePosition = Input.mousePosition;
+            mousePosition.z = 60f;
+            Vector3 worldPosition = Camera.main.ScreenToWorldPoint(mousePosition);
+            grid.GetXY(worldPosition, out int x, out int y);
+            Debug.Log(gridLogicSystem.AdjacentCandyGridCellPositionsSameColor(x, y));
+            //gridLogicSystem.ClearConnectedSameColorCandyBlocks(x, y);
+        }
+        
+    }
+
+    private void UpdateVisual()
+    {
+        foreach (CandyOnGridCell candyGrid in candyGridDictionary.Keys)
+        {
+            candyGridDictionary[candyGrid].Update();
+        }
+        
+    }
+
     private void SetBusyState(float busyTimer, Action onBusyTimerElapsedAction) {
         SetState(State.Busy);
         this.busyTimer = busyTimer;
@@ -126,12 +176,15 @@ public class GridVisualSystem : MonoBehaviour
     {
         private Transform transform;
         private CandyOnGridCell candyOnGridCell;
+        private GridLogicSystem gridLogicSystem;
         
-        public CandyGridVisual(Transform transform, CandyOnGridCell candyOnGridCell)
+        
+        public CandyGridVisual(Transform transform, CandyOnGridCell candyOnGridCell, GridLogicSystem gridLogicSystem)
         {
             this.transform = transform;
             this.candyOnGridCell = candyOnGridCell;
-            
+            this.gridLogicSystem = gridLogicSystem;
+
             
             candyOnGridCell.OnDestroyed += CandyOnGridCell_OnDestroyed;
         }
@@ -141,7 +194,7 @@ public class GridVisualSystem : MonoBehaviour
         }
         public void Update()
         {
-            Vector3 targetPosition = candyOnGridCell.GetWorldPosition();
+            Vector3 targetPosition = candyOnGridCell.GetWorldPosition() * gridLogicSystem.grid.GetCellSize();
             Vector3 moveDir = (targetPosition - transform.position);
             float moveSpeed = 10f;
             transform.position += moveDir * moveSpeed * Time.deltaTime;

@@ -66,7 +66,7 @@ public class LevelEditor : MonoBehaviour
                 }
             }
         }
-        cameraTransform.position = new Vector3(grid.GetColumnsCount() * .5f, grid.GetRowsCount() * .5f, cameraTransform.position.z);
+        //cameraTransform.position = new Vector3(grid.GetColumnsCount() * .5f, grid.GetRowsCount() * .5f, cameraTransform.position.z);
     }
 
     private void Update()

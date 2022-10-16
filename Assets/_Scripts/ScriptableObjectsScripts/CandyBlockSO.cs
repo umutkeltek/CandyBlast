@@ -6,6 +6,7 @@ using UnityEngine;
 [CreateAssetMenu()]
 public class CandyBlockSO : ScriptableObject
 {
+    public int id;
     public string candyName;
     public Sprite defaultCandySprite;
     public Sprite level1CandySprite;

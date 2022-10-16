@@ -19,9 +19,10 @@ public class CandyOnGridCell
         this.x = x;
         this.y = y;
         isDestroyed = false;
+        
     }
     
-    public CandyBlockSO GetCandyBlock()
+    public CandyBlockSO GetCandyBlockSO()
     {
         return candyBlock;
     }
@@ -29,6 +30,14 @@ public class CandyOnGridCell
     public Vector3 GetWorldPosition()
     {
         return new Vector3(x, y );
+    }
+    public int GetX()
+    {
+        return x;
+    }
+    public int GetY()
+    {
+        return y;
     }
     public void SetCandyXY(int x, int y)
     {

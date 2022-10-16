@@ -79,7 +79,7 @@ public class CandyGridCellPosition
     
     public override string ToString()
     {
-        return candyBlock?.ToString();
+        return candyBlock?.ToString() ?? "Empty";
     } 
     
     
