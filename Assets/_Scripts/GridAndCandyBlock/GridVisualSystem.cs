@@ -11,8 +11,8 @@ public class GridVisualSystem : MonoBehaviour
     public enum State
     {
         Busy,
-        WaitingForPlayer,
-        TryFindMatches,
+        BeforePlayerTurn,
+        AfterPlayerTurn,
         GameOver
     }
     [SerializeField] private Transform pfCandyGridVisual;
@@ -86,7 +86,7 @@ public class GridVisualSystem : MonoBehaviour
             }
         }
 
-        SetBusyState(0.1f, () => SetState(State.TryFindMatches));
+        SetBusyState(0.1f, () => SetState(State.BeforePlayerTurn));
         isSetup= true;
 
     }
@@ -103,7 +103,12 @@ public class GridVisualSystem : MonoBehaviour
     {
         Vector3 position = e.candyGridCellPosition.GetWorldPosition();
         position = new Vector3(position.x,position.y);
+        
         Transform candyGridVisualTransform = Instantiate(pfCandyGridVisual, position, Quaternion.identity);
+        candyGridVisualTransform.Find("sprite").GetComponent<SpriteRenderer>().sprite = e.candyOnGridCell.GetCandyBlockSO().defaultCandySprite;
+        
+        CandyGridVisual candyGridVisual = new CandyGridVisual(candyGridVisualTransform, e.candyOnGridCell,gridLogicSystem);
+        candyGridDictionary[e.candyOnGridCell] = candyGridVisual;
     }
 
     private void Update()
@@ -120,30 +125,46 @@ public class GridVisualSystem : MonoBehaviour
                     onBusyTimerElapsedAction();
                 }
                 break;
-            case State.WaitingForPlayer:
-                break;
-            case State.TryFindMatches:
-                /*if (gridLogicSystem.TryFindMatches())
-                {
-                    SetBusyState(0.1f, () => SetState(State.WaitingForPlayer));
+            case State.BeforePlayerTurn:
+                if (Input.GetMouseButtonDown(0))
+                {   Vector3 mousePosition = Input.mousePosition;
+                    mousePosition.z = 60f;
+                    Vector3 worldPosition = Camera.main.ScreenToWorldPoint(mousePosition);
+                    grid.GetXY(worldPosition, out int x, out int y);
+                    if (gridLogicSystem.HasAnyConnectedSameColorCandyBlocks(x,y))
+                    {   gridLogicSystem.ClearConnectedSameColorCandyBlocks(x,y);
+                        SetState(State.AfterPlayerTurn);
+                    }
+
                 }
-                else
-                {
-                    SetState(State.WaitingForPlayer);
-                }*/
                 break;
+            case State.AfterPlayerTurn:
+                SetBusyState(.3f, () =>
+                {
+                    gridLogicSystem.FallGemsIntoEmptyPosition();
+                    
+                    SetBusyState(.3f, () =>
+                    {
+                        gridLogicSystem.SpawnNewMissingGridPositions();
+                        SetBusyState(.3f,()=> SetState(State.BeforePlayerTurn));
+                    });
+                });
+                
+                
+                break;
+            
             case State.GameOver:
                 break;
         }
 
-        if (Input.GetMouseButtonDown(0))
+        /*if (Input.GetMouseButtonDown(0))
         {   Vector3 mousePosition = Input.mousePosition;
             mousePosition.z = 60f;
             Vector3 worldPosition = Camera.main.ScreenToWorldPoint(mousePosition);
             grid.GetXY(worldPosition, out int x, out int y);
-            Debug.Log(gridLogicSystem.AdjacentCandyGridCellPositionsSameColor(x, y));
+            //Debug.Log(gridLogicSystem.AdjacentCandyGridCellPositionsSameColor(x, y).Count);
             //gridLogicSystem.ClearConnectedSameColorCandyBlocks(x, y);
-        }
+        }*/
         
     }
 
@@ -160,6 +181,7 @@ public class GridVisualSystem : MonoBehaviour
         SetState(State.Busy);
         this.busyTimer = busyTimer;
         this.onBusyTimerElapsedAction = onBusyTimerElapsedAction;
+        
     }
     private void SetState(State state) {
         this.state = state;
@@ -190,11 +212,11 @@ public class GridVisualSystem : MonoBehaviour
         }
         private void CandyOnGridCell_OnDestroyed(object sender, System.EventArgs e)
         {   //transform.GetComponent<Animation>().Play();
-            Destroy(transform.gameObject); //,1f);
+            Destroy(transform.gameObject,0.5f); //,1f);
         }
         public void Update()
         {
-            Vector3 targetPosition = candyOnGridCell.GetWorldPosition() * gridLogicSystem.grid.GetCellSize();
+            Vector3 targetPosition = candyOnGridCell.GetWorldPosition()* gridLogicSystem.grid.GetCellSize();
             Vector3 moveDir = (targetPosition - transform.position);
             float moveSpeed = 10f;
             transform.position += moveDir * moveSpeed * Time.deltaTime;
