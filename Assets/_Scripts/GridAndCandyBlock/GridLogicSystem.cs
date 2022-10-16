@@ -154,8 +154,9 @@ public class GridLogicSystem : MonoBehaviour
                             candyGridCellPosition.GetCandyBlock().SetCandyXY(x,i);
                             candyGridCellPositionBelow.SetCandyBlock(candyGridCellPosition.GetCandyBlock());
                             candyGridCellPosition.ClearCandyBlock();
-                            
+
                             candyGridCellPosition = candyGridCellPositionBelow;
+                            
                         }
                         else
                         {

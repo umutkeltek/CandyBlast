@@ -106,7 +106,7 @@ public class GridVisualSystem : MonoBehaviour
         
         Transform candyGridVisualTransform = Instantiate(pfCandyGridVisual, position, Quaternion.identity);
         candyGridVisualTransform.Find("sprite").GetComponent<SpriteRenderer>().sprite = e.candyOnGridCell.GetCandyBlockSO().defaultCandySprite;
-        
+        candyGridVisualTransform.Find("sprite").GetComponent<SpriteRenderer>().sortingOrder = e.candyGridCellPosition.GetY();
         CandyGridVisual candyGridVisual = new CandyGridVisual(candyGridVisualTransform, e.candyOnGridCell,gridLogicSystem);
         candyGridDictionary[e.candyOnGridCell] = candyGridVisual;
     }
@@ -200,7 +200,8 @@ public class GridVisualSystem : MonoBehaviour
         private CandyOnGridCell candyOnGridCell;
         private GridLogicSystem gridLogicSystem;
         
-        
+
+
         public CandyGridVisual(Transform transform, CandyOnGridCell candyOnGridCell, GridLogicSystem gridLogicSystem)
         {
             this.transform = transform;
@@ -212,11 +213,12 @@ public class GridVisualSystem : MonoBehaviour
         }
         private void CandyOnGridCell_OnDestroyed(object sender, System.EventArgs e)
         {   //transform.GetComponent<Animation>().Play();
-            Destroy(transform.gameObject,0.5f); //,1f);
+            Destroy(transform.gameObject,0.2f); //,1f);
         }
         public void Update()
         {
             Vector3 targetPosition = candyOnGridCell.GetWorldPosition()* gridLogicSystem.grid.GetCellSize();
+            transform.GetComponentInChildren<SpriteRenderer>().sortingOrder = candyOnGridCell.GetY();
             Vector3 moveDir = (targetPosition - transform.position);
             float moveSpeed = 10f;
             transform.position += moveDir * moveSpeed * Time.deltaTime;
