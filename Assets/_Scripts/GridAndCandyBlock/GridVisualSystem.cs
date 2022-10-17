@@ -127,12 +127,17 @@ public class GridVisualSystem : MonoBehaviour
                 break;
             case State.BeforePlayerTurn:
                 if (Input.GetMouseButtonDown(0))
-                {   Vector3 mousePosition = Input.mousePosition;
+                {
+                    if (!gridLogicSystem.IsAnyConnectedGroupAvailable())
+                    {
+                        gridLogicSystem.DestroyAllCandyBlocks();
+                    }
+                    Vector3 mousePosition = Input.mousePosition;
                     mousePosition.z = 60f;
                     Vector3 worldPosition = Camera.main.ScreenToWorldPoint(mousePosition);
                     grid.GetXY(worldPosition, out int x, out int y);
                     if (gridLogicSystem.HasAnyConnectedSameColorCandyBlocks(x,y))
-                    {   gridLogicSystem.ClearConnectedSameColorCandyBlocks(x,y);
+                    {   gridLogicSystem.DestroyConnectedSameColorCandyBlocks(x,y);
                         SetState(State.AfterPlayerTurn);
                     }
 
@@ -156,15 +161,6 @@ public class GridVisualSystem : MonoBehaviour
             case State.GameOver:
                 break;
         }
-
-        /*if (Input.GetMouseButtonDown(0))
-        {   Vector3 mousePosition = Input.mousePosition;
-            mousePosition.z = 60f;
-            Vector3 worldPosition = Camera.main.ScreenToWorldPoint(mousePosition);
-            grid.GetXY(worldPosition, out int x, out int y);
-            //Debug.Log(gridLogicSystem.AdjacentCandyGridCellPositionsSameColor(x, y).Count);
-            //gridLogicSystem.ClearConnectedSameColorCandyBlocks(x, y);
-        }*/
         
     }
 
@@ -210,6 +206,7 @@ public class GridVisualSystem : MonoBehaviour
 
             
             candyOnGridCell.OnDestroyed += CandyOnGridCell_OnDestroyed;
+            
         }
         private void CandyOnGridCell_OnDestroyed(object sender, System.EventArgs e)
         {   //transform.GetComponent<Animation>().Play();
