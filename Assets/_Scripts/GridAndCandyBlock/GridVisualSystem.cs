@@ -49,7 +49,7 @@ public class GridVisualSystem : MonoBehaviour
         this.gridLogicSystem = gridLogicSystem;
         this.grid = grid;
         
-        float cameraYOffset = 1f;
+        //float cameraYOffset = 1f;
         //cameraTransform.position = new Vector3(grid.GetColumnsCount() * .5f, grid.GetRowsCount() * .5f + cameraYOffset, cameraTransform.position.z);
         
         gridLogicSystem.OnCandyGridPositionDestroyed += GridLogicSystem_OnCandyGridPositionDestroyed;
@@ -103,7 +103,7 @@ public class GridVisualSystem : MonoBehaviour
     private void GridLogicSystem_OnNewCandyGridSpawned(object sender, GridLogicSystem.OnNewCandyGridSpawnedEventArgs e)
     {
         Vector3 position = e.candyGridCellPosition.GetWorldPosition();
-        position = new Vector3(position.x,position.y);
+        position = new Vector3(position.x,20);
         
         Transform candyGridVisualTransform = Instantiate(pfCandyGridVisual, position, Quaternion.identity);
         candyGridVisualTransform.Find("sprite").GetComponent<SpriteRenderer>().sprite = e.candyOnGridCell.GetCandyBlockSO().defaultCandySprite;
@@ -127,11 +127,13 @@ public class GridVisualSystem : MonoBehaviour
                 }
                 break;
             case State.BeforePlayerTurn:
+                
                 if (Input.GetMouseButtonDown(0))
-                {
-                    if (!gridLogicSystem.IsAnyConnectedGroupAvailable())
+                {   List<List<CandyGridCellPosition>> allSameColorConnectedGroups = gridLogicSystem.GetAllConnectedGroups();
+                    if (!gridLogicSystem.IsAnyConnectedGroupAvailable(allSameColorConnectedGroups))
                     {
                         gridLogicSystem.DestroyAllCandyBlocks();
+                        SetBusyState(.1f, () => SetState(State.BeforePlayerTurn));
                     }
                     Vector3 mousePosition = Input.mousePosition;
                     mousePosition.z = 60f;
@@ -145,15 +147,15 @@ public class GridVisualSystem : MonoBehaviour
                 }
                 break;
             case State.AfterPlayerTurn:
-                SetBusyState(.3f, () =>
+                SetBusyState(.2f, () =>
                 {
                     gridLogicSystem.FallGemsIntoEmptyPosition();
                     
-                    SetBusyState(.3f, () =>
+                    SetBusyState(.2f, () =>
                     {
                         gridLogicSystem.SpawnNewMissingGridPositions();
-                        SetBusyState(.3f, () =>
-                        {
+                        SetBusyState(.4f, () =>
+                        {   
                             gridLogicSystem.ChangeIconBasedOnSameColorConnectedGroups();
                             SetBusyState(.1f, ()=>SetState(State.BeforePlayerTurn));
                         });
@@ -200,7 +202,7 @@ public class GridVisualSystem : MonoBehaviour
         private Transform transform;
         private CandyOnGridCell candyOnGridCell;
         private GridLogicSystem gridLogicSystem;
-        
+        private int IconLevel;
         
 
 
@@ -209,11 +211,9 @@ public class GridVisualSystem : MonoBehaviour
             this.transform = transform;
             this.candyOnGridCell = candyOnGridCell;
             this.gridLogicSystem = gridLogicSystem;
-
             
             candyOnGridCell.OnDestroyed += CandyOnGridCell_OnDestroyed;
             candyOnGridCell.OnIconLevelChanged += CandyOnGridCell_OnIconLevelChanged;
-            
         }
         private void CandyOnGridCell_OnDestroyed(object sender, System.EventArgs e)
         {   //transform.GetComponent<Animation>().Play();
@@ -230,6 +230,7 @@ public class GridVisualSystem : MonoBehaviour
         public void Update()
         {
             Vector3 targetPosition = candyOnGridCell.GetWorldPosition()* gridLogicSystem.grid.GetCellSize();
+            transform.GetComponentInChildren<SpriteRenderer>().sprite = candyOnGridCell.GetSprite();
             transform.GetComponentInChildren<SpriteRenderer>().sortingOrder = candyOnGridCell.GetY();
             Vector3 moveDir = (targetPosition - transform.position);
             float moveSpeed = 10f;
