@@ -84,7 +84,7 @@ public class GridVisualSystem : MonoBehaviour
                 
             }
         }
-        this.gridLogicSystem.ChangeIconBasedOnSameColorConnectedGroups();
+        this.gridLogicSystem.ChangeIconAllCandyBlocks();
         Debug.Log(gridLogicSystem.GetAllPossibleMoves().Count.ToString());
         SetBusyState(0.1f, () => SetState(State.BeforePlayerTurn));
         isSetup= true;
@@ -154,7 +154,7 @@ public class GridVisualSystem : MonoBehaviour
                         gridLogicSystem.SpawnNewMissingGridPositions();
                         SetBusyState(.4f, () =>
                         {   
-                            gridLogicSystem.ChangeIconBasedOnSameColorConnectedGroups();
+                            gridLogicSystem.ChangeIconAllCandyBlocks();
                             SetBusyState(.1f, ()=>SetState(State.BeforePlayerTurn));
                         });
                     });

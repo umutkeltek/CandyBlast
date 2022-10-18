@@ -621,6 +621,56 @@ public class GridLogicSystem : MonoBehaviour
         return glassAmount;
     } //returns the amount of glass blocks in the grid
     
+    public void ChangeIconAllCandyBlocks()
+    {
+        List<PossibleMove> possibleMoves = GetAllPossibleMoves();
+        bool[,] isCandyBlockChanged = new bool[columns, rows];
+        for (int x = 0; x < columns; x++)
+        {
+            for (int y = 0; y < rows; y++)
+            {
+                isCandyBlockChanged[x, y] = false;
+            }
+        }
+        foreach (PossibleMove possibleMove in possibleMoves)
+        {   
+            if (possibleMove.connectedCandyGridCellPositionsCount >= level3Icons)
+            {
+                foreach (var candyGridCellPosition in possibleMove.connectedCandyGridCellPositions)
+                {   
+                    candyGridCellPosition.GetCandyBlock().SetIconLevel(3);
+                    isCandyBlockChanged[candyGridCellPosition.GetX(), candyGridCellPosition.GetY()] = true;
+                }
+            }
+            else if (possibleMove.connectedCandyGridCellPositionsCount >= level2Icons)
+            {
+                foreach (var candyGridCellPosition in possibleMove.connectedCandyGridCellPositions)
+                {
+                    candyGridCellPosition.GetCandyBlock().SetIconLevel(2);
+                    isCandyBlockChanged[candyGridCellPosition.GetX(), candyGridCellPosition.GetY()] = true;
+                }
+            }
+            else if (possibleMove.connectedCandyGridCellPositionsCount >= level1Icons)
+            {
+                foreach (var candyGridCellPosition in possibleMove.connectedCandyGridCellPositions)
+                {
+                    candyGridCellPosition.GetCandyBlock().SetIconLevel(1);
+                    isCandyBlockChanged[candyGridCellPosition.GetX(), candyGridCellPosition.GetY()] = true;
+                }
+            }
+
+        }
+        for (int x = 0; x < columns; x++)
+        {
+            for (int y = 0; y < rows; y++)
+            {
+                if (isCandyBlockChanged[x, y] == false)
+                {
+                    grid.GetGridObject(x, y).GetCandyBlock().SetIconLevel(0);
+                }
+            }
+        }
+    } 
     public List<PossibleMove> GetAllPossibleMoves()
     {
         List<PossibleMove> possibleMoves = new List<PossibleMove>();
@@ -636,8 +686,10 @@ public class GridLogicSystem : MonoBehaviour
                     possibleMove.x = x;
                     possibleMove.y = y;
                     possibleMove.connectedCandyGridCellPositions = AdjacentCandyGridCellPositionsSameColor(x,y,ref connectedCandyBlocks, ref visited);
+                    connectedCandyBlocks.Add(grid.GetGridObject(x, y));
                     possibleMove.setConnectedCandyGridCellPositionsCount(connectedCandyBlocks.Count);
                     possibleMoves.Add(possibleMove);
+                    Debug.Log("Possible Move: " + possibleMove.x + "," + possibleMove.y + " Connected Candy Blocks: " + possibleMove.connectedCandyGridCellPositionsCount);
                 }
                 
             }
@@ -654,6 +706,7 @@ public class GridLogicSystem : MonoBehaviour
         {
             this.x = x;
             this.y = y;
+            
         }
         public void setConnectedCandyGridCellPositionsCount(int connectedCandyGridCellPositionsCount)
         {
