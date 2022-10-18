@@ -85,6 +85,7 @@ public class GridVisualSystem : MonoBehaviour
                 
             }
         }
+        this.gridLogicSystem.ChangeIconBasedOnSameColorConnectedGroups();
 
         SetBusyState(0.1f, () => SetState(State.BeforePlayerTurn));
         isSetup= true;
@@ -151,7 +152,11 @@ public class GridVisualSystem : MonoBehaviour
                     SetBusyState(.3f, () =>
                     {
                         gridLogicSystem.SpawnNewMissingGridPositions();
-                        SetBusyState(.3f,()=> SetState(State.BeforePlayerTurn));
+                        SetBusyState(.3f, () =>
+                        {
+                            gridLogicSystem.ChangeIconBasedOnSameColorConnectedGroups();
+                            SetBusyState(.1f, ()=>SetState(State.BeforePlayerTurn));
+                        });
                     });
                 });
                 
@@ -196,6 +201,7 @@ public class GridVisualSystem : MonoBehaviour
         private CandyOnGridCell candyOnGridCell;
         private GridLogicSystem gridLogicSystem;
         
+        
 
 
         public CandyGridVisual(Transform transform, CandyOnGridCell candyOnGridCell, GridLogicSystem gridLogicSystem)
@@ -206,11 +212,20 @@ public class GridVisualSystem : MonoBehaviour
 
             
             candyOnGridCell.OnDestroyed += CandyOnGridCell_OnDestroyed;
+            candyOnGridCell.OnIconLevelChanged += CandyOnGridCell_OnIconLevelChanged;
             
         }
         private void CandyOnGridCell_OnDestroyed(object sender, System.EventArgs e)
         {   //transform.GetComponent<Animation>().Play();
             Destroy(transform.gameObject,0.2f); //,1f);
+        }
+        
+        private void CandyOnGridCell_OnIconLevelChanged(object sender, CandyOnGridCell.OnIconLevelChangedEventArgs e)
+        {  //transform.GetComponent<Animation>().Play();
+            
+            transform.Find("sprite").GetComponent<SpriteRenderer>().sprite = e.candyOnGridCell.GetSprite();
+            transform.Find("sprite").GetComponent<SpriteRenderer>().sortingOrder = e.candyOnGridCell.GetY();
+            
         }
         public void Update()
         {

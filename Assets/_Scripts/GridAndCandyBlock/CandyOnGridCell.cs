@@ -8,6 +8,8 @@ using System;
 public class CandyOnGridCell
 {
     public event EventHandler OnDestroyed;
+    public event EventHandler<OnIconLevelChangedEventArgs> OnIconLevelChanged;
+    private int iconLevel;
     private CandyBlockSO candyBlock;
     private int x;
     private int y;
@@ -21,6 +23,13 @@ public class CandyOnGridCell
         isDestroyed = false;
         
     }
+    
+    public class OnIconLevelChangedEventArgs : EventArgs
+    {   public CandyOnGridCell candyOnGridCell { get; set; }
+        public CandyBlockSO candyBlock;
+        public int iconLevel;
+    }
+    
     
     public CandyBlockSO GetCandyBlockSO()
     {
@@ -44,6 +53,36 @@ public class CandyOnGridCell
         this.x = x;
         this.y = y;
     }
+    public Sprite GetSprite()
+    {   
+        switch (iconLevel)
+        {
+            case 0:
+                return candyBlock.defaultCandySprite;
+                break;
+            case 1:
+                return candyBlock.level1CandySprite;
+                break;
+            case 2:
+                return candyBlock.level2CandySprite;
+                break;
+            case 3:
+                return candyBlock.level3CandySprite;
+                break;
+            default:
+                return candyBlock.defaultCandySprite;
+        }
+        
+    }
+    public void SetIconLevel(int IconLevel)
+    {   
+        iconLevel = IconLevel;
+        OnIconLevelChanged?.Invoke(this, new OnIconLevelChangedEventArgs()
+        {   candyOnGridCell = this,
+            candyBlock = candyBlock,
+            iconLevel = iconLevel
+        });
+    }
 
     public void Destroy()
     {
@@ -54,6 +93,6 @@ public class CandyOnGridCell
 
     public override string ToString()
     {
-        return isDestroyed.ToString();
+        return GetX().ToString() + " " + GetY().ToString();
     }
 }

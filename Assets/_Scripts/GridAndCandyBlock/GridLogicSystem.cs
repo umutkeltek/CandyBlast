@@ -12,6 +12,8 @@ public class GridLogicSystem : MonoBehaviour
 {   public event EventHandler OnCandyGridPositionDestroyed; //event for when a candy is destroyed
     public event EventHandler<OnNewCandyGridSpawnedEventArgs> OnNewCandyGridSpawned; //event for when a new candy is spawned
     public event EventHandler<OnLevelSetEventArgs> OnLevelSet; //event for when a level is set
+    
+    public event EventHandler OnChangeIconLevel; //event for when the icon level is changed === TODO: make this work
     public event EventHandler OnGlassDestroyed; 
     public event EventHandler OnMoveUsed; 
     public event EventHandler OnOutOfMoves;
@@ -32,12 +34,17 @@ public class GridLogicSystem : MonoBehaviour
     [Header("Initializing Level Settings")]
     [SerializeField] private LevelSO levelSO;
     [SerializeField] private bool autoLoadLevel;
+    [Header("Conditions for changing icons")]
+    [SerializeField] private int level1Icons;
+    [SerializeField] private int level2Icons;
+    [SerializeField] private int level3Icons;
     
     public GridXY<CandyGridCellPosition> grid;
     private int score;
     private int columns;
     private int rows;
     private int moveCount;
+
     
 
     private void Start()
@@ -93,34 +100,7 @@ public class GridLogicSystem : MonoBehaviour
         OnLevelSet?.Invoke(this, new OnLevelSetEventArgs {levelSO = levelSO, grid = grid});
         
     }
-    public int GetScore() {
-        return score;
-    } //returns the score
-    public bool HasMoveAvailable() {
-        return moveCount > 0;
-    } //returns true if there are moves available
-    public int GetMoveCount() {
-        return moveCount;
-    } //returns the move count
-    public int GetUsedMoveCount() {
-        return levelSO.moveAmount - moveCount;
-    } //returns the used move count
-    public void UseMove() {
-        moveCount--;
-        OnMoveUsed?.Invoke(this, EventArgs.Empty);
-    } //decreses the move count by 1
-    public int GetGlassAmount() {
-        int glassAmount = 0;
-        for (int x = 0; x < columns; x++) {
-            for (int y = 0; y < rows; y++) {
-                CandyGridCellPosition candyGridCellPosition = grid.GetGridObject(x, y);
-                if (candyGridCellPosition.HasGlass()) {
-                    glassAmount++;
-                }
-            }
-        }
-        return glassAmount;
-    } //returns the amount of glass blocks in the grid
+    
     public void SpawnNewMissingGridPositions()
     {
         for (int x = 0; x < columns; x++)
@@ -156,7 +136,6 @@ public class GridLogicSystem : MonoBehaviour
                             candyGridCellPosition.GetCandyBlock().SetCandyXY(x,i);
                             candyGridCellPositionBelow.SetCandyBlock(candyGridCellPosition.GetCandyBlock());
                             candyGridCellPosition.ClearCandyBlock();
-
                             candyGridCellPosition = candyGridCellPositionBelow;
                             
                         }
@@ -181,38 +160,28 @@ public class GridLogicSystem : MonoBehaviour
             return true;
         }
     }
-    private CandyBlockSO GetCandyBlockSO(int x, int y) 
-    {
-        if (!IsValidPosition(x, y))
-        {
-            return null;
-        }
-        CandyGridCellPosition candyGridCellPosition = grid.GetGridObject(x, y);
-
-        if (candyGridCellPosition.GetCandyBlock() == null)
-        {
-            return null;
-        }
-        return candyGridCellPosition.GetCandyBlock().GetCandyBlockSO();
-    }
+    
     public List<List<CandyGridCellPosition>> GetAllConnectedGroups()
     {
         List<List<CandyGridCellPosition>> connectedAllSameColorGroups = new List<List<CandyGridCellPosition>>();
-
+        bool[,] visited = new bool[columns, rows];
         for (int x = 0; x < columns; x++)
         {
             for (int y = 0; y < rows; y++)
             {
-                GetConnectedSameColorCandyBlocks(x, y);
-                if (GetConnectedSameColorCandyBlocks(x,y) != null && GetConnectedSameColorCandyBlocks(x,y).Count >= 2)
+                if (visited[x,y] == false)
                 {
-                    connectedAllSameColorGroups.Add(GetConnectedSameColorCandyBlocks(x, y));
+                    List<CandyGridCellPosition> candyGridCellPositions = GetConnectedSameColorCandyBlocks(x, y,ref visited);
+                    if (candyGridCellPositions != null )//&& candyGridCellPositions.Count >= 2)
+                    {
+                        connectedAllSameColorGroups.Add(candyGridCellPositions);
+                    }
                 }
                 
             }
             
         }
-
+        
         return connectedAllSameColorGroups;
         
     }
@@ -225,16 +194,40 @@ public class GridLogicSystem : MonoBehaviour
         List<List<CandyGridCellPosition>> connectedAllSameColorGroups = GetAllConnectedGroups();
         foreach (List<CandyGridCellPosition> connectedSameColorGroup in connectedAllSameColorGroups)
         {
-            if (connectedSameColorGroup.Count>3)
+            if (connectedSameColorGroup.Count<level1Icons)
             {
-                foreach (var candyGridCellPosition in connectedSameColorGroup)
-                {
-                    
+                foreach (CandyGridCellPosition candyGridCellPosition in connectedSameColorGroup)
+                {   
+                    //Debug.Log(candyGridCellPosition.GetX() + candyGridCellPosition.GetY() + candyGridCellPosition.GetCandyBlock().GetSprite().name + connectedSameColorGroup.Count);
+                    candyGridCellPosition.GetCandyBlock().SetIconLevel(0);
+                }
+                
+            }
+            
+            else if (connectedSameColorGroup.Count>=level1Icons && connectedSameColorGroup.Count<level2Icons)
+            {
+                foreach (CandyGridCellPosition candyGridCellPosition in connectedSameColorGroup)
+                {   
+                    //Debug.Log(candyGridCellPosition.GetX() + candyGridCellPosition.GetY() + candyGridCellPosition.GetCandyBlock().GetSprite().name + connectedSameColorGroup.Count);
+                    candyGridCellPosition.GetCandyBlock().SetIconLevel(1);
+                    //Debug.Log(candyGridCellPosition.GetX() + candyGridCellPosition.GetY() + candyGridCellPosition.GetCandyBlock().GetSprite().name);
                 }
             }
-            foreach (CandyGridCellPosition candyGridCellPosition in connectedSameColorGroup)
+            else if (connectedSameColorGroup.Count >= level2Icons && connectedSameColorGroup.Count < level3Icons)
             {
-                candyGridCellPosition.SetHasGlass(true);
+                foreach (CandyGridCellPosition candyGridCellPosition in connectedSameColorGroup)
+                {   //Debug.Log(candyGridCellPosition.GetX() + candyGridCellPosition.GetY() + candyGridCellPosition.GetCandyBlock().GetSprite().name+ connectedSameColorGroup.Count);
+                    candyGridCellPosition.GetCandyBlock().SetIconLevel(2);
+                    //Debug.Log(candyGridCellPosition.GetX() + candyGridCellPosition.GetY() + candyGridCellPosition.GetCandyBlock().GetSprite().name);
+                }
+            }
+            else if (connectedSameColorGroup.Count >= level3Icons)
+            {
+                foreach (CandyGridCellPosition candyGridCellPosition in connectedSameColorGroup)
+                {   //Debug.Log(candyGridCellPosition.GetX() + candyGridCellPosition.GetY() + candyGridCellPosition.GetCandyBlock().GetSprite().name+ connectedSameColorGroup.Count);
+                    candyGridCellPosition.GetCandyBlock().SetIconLevel(3);
+                    //Debug.Log(candyGridCellPosition.GetX() + candyGridCellPosition.GetY() + candyGridCellPosition.GetCandyBlock().GetSprite().name);
+                }
             }
         }
     }
@@ -262,6 +255,22 @@ public class GridLogicSystem : MonoBehaviour
             }*/
         }
     }
+    public List<CandyGridCellPosition> GetConnectedSameColorCandyBlocks(int x, int y,ref bool[,] visited)
+    {   List<CandyGridCellPosition> connectedSameColorGroup = new List<CandyGridCellPosition>();
+        CandyBlockSO candyBlockSO = GetCandyBlockSO(x, y);
+        if (candyBlockSO == null) { return null; }
+        if (!HasAnyConnectedSameColorCandyBlocks(x,y)) { return null;}
+        else
+        {
+            
+            AdjacentCandyGridCellPositionsSameColor(x, y, ref connectedSameColorGroup, ref visited);
+            //connectedSameColorGroup.Distinct();
+            
+        }
+        
+        return connectedSameColorGroup;
+
+    }
     public List<CandyGridCellPosition> GetConnectedSameColorCandyBlocks(int x, int y)
     {   List<CandyGridCellPosition> connectedSameColorGroup = new List<CandyGridCellPosition>();
         CandyBlockSO candyBlockSO = GetCandyBlockSO(x, y);
@@ -271,10 +280,15 @@ public class GridLogicSystem : MonoBehaviour
         {
             
             bool[,] visited = new bool[columns, rows];
-            AdjacentCandyGridCellPositionsSameColor(x, y, ref connectedSameColorGroup, ref visited);
+            AdjacentCandyGridCellPositionsSameColor(x, y, ref connectedSameColorGroup, ref visited,candyBlockSO);
             //connectedSameColorGroup.Distinct();
+            /*foreach (var VARIABLE in connectedSameColorGroup)
+            {
+                Debug.Log("  bosluk" +VARIABLE.GetX() + VARIABLE.GetY() + VARIABLE.GetCandyBlock().GetCandyBlockSO().name);
+            }*/
+            
         }
-
+        
         return connectedSameColorGroup;
 
     }
@@ -287,33 +301,150 @@ public class GridLogicSystem : MonoBehaviour
         {
             return null;
         }
-        if (IsValidPosition(x, y) && HasAnyConnectedSameColorCandyBlocks(x,y))
+        if (IsValidPosition(x, y))//&& visited[x,y] ==false )
         {   visited[x, y] = true;
             candyGridCellPositions.Add(grid.GetGridObject(x, y));
-            if (IsValidPosition(x, y+1) && visited[x,y+1] == false && GetCandyBlockSO(x, y+1) == candyBlockSO)
-            {   visited[x, y + 1] = true;
-                candyGridCellPositions.Add(grid.GetGridObject(x, y+1));
-                AdjacentCandyGridCellPositionsSameColor(x, y+1, ref candyGridCellPositions, ref visited);
+            if (IsValidPosition(x,y+1) && visited[x,y+1]==false)
+            {
+                visited[x, y + 1] = true;
+                if (GetCandyBlockSO(x,y+1) == candyBlockSO)
+                {
+                    candyGridCellPositions.Add(grid.GetGridObject(x, y+1));
+                    //Debug.Log(grid.GetGridObject(x, y+1).GetX() +" bosluk "+ grid.GetGridObject(x, y+1).GetY() +" bosluk "+ grid.GetGridObject(x, y+1).GetCandyBlock().GetCandyBlockSO().candyName);
+                    AdjacentCandyGridCellPositionsSameColor(x, y+1, ref candyGridCellPositions, ref visited);
+                }
             }
-            if (IsValidPosition(x, y-1) && visited[x,y-1] == false && GetCandyBlockSO(x, y-1) == candyBlockSO)
-            {   visited[x, y - 1] = true;
-                candyGridCellPositions.Add(grid.GetGridObject(x, y-1));
-                AdjacentCandyGridCellPositionsSameColor(x, y-1, ref candyGridCellPositions, ref visited);
+            if (IsValidPosition(x+1,y) && visited[x+1,y]==false)
+            {
+                visited[x+1, y] = true;
+                if (GetCandyBlockSO(x+1,y) == candyBlockSO)
+                {
+                    candyGridCellPositions.Add(grid.GetGridObject(x+1, y));
+                    AdjacentCandyGridCellPositionsSameColor(x+1, y, ref candyGridCellPositions, ref visited);
+                }
             }
-            if (IsValidPosition(x+1, y) && visited[x+1,y] == false && GetCandyBlockSO(x+1, y) == candyBlockSO)
-            {   visited[x+1, y] = true;
-                candyGridCellPositions.Add(grid.GetGridObject(x+1, y));
-                AdjacentCandyGridCellPositionsSameColor(x+1, y, ref candyGridCellPositions, ref visited);
+            if (IsValidPosition(x,y-1) && visited[x,y-1]==false)
+            {
+                visited[x, y - 1] = true;
+                if (GetCandyBlockSO(x,y-1) == candyBlockSO)
+                {
+                    candyGridCellPositions.Add(grid.GetGridObject(x, y-1));
+                    AdjacentCandyGridCellPositionsSameColor(x, y-1, ref candyGridCellPositions, ref visited);
+                }
             }
-            if (IsValidPosition(x-1, y)&& visited[x-1,y] ==false && GetCandyBlockSO(x-1, y) == candyBlockSO)
-            {   visited[x-1, y] = true;
-                Debug.Log(x-1 + " " + y);
-                candyGridCellPositions.Add(grid.GetGridObject(x-1, y));
-                AdjacentCandyGridCellPositionsSameColor(x-1, y, ref candyGridCellPositions, ref visited);
+            
+            if (IsValidPosition(x-1,y) && visited[x-1,y]==false)
+            {
+                visited[x-1, y] = true;
+                if (GetCandyBlockSO(x-1,y) == candyBlockSO)
+                {
+                    candyGridCellPositions.Add(grid.GetGridObject(x-1, y));
+                    AdjacentCandyGridCellPositionsSameColor(x-1, y, ref candyGridCellPositions, ref visited);
+                }
+            }
+            
+        }
+        List<CandyGridCellPosition> distinctCandyGridCellPositions = candyGridCellPositions.Distinct().ToList();
+        //Debug.Log(candyGridCellPositions.Count + " candyGridCellPositions.Count");
+        return distinctCandyGridCellPositions;
+    }
+    
+    public List<CandyGridCellPosition> AdjacentCandyGridCellPositionsSameColor(int x, int  y, ref List<CandyGridCellPosition> candyGridCellPositions,ref bool[,] visited,CandyBlockSO candyBlockSO) 
+    {   //this method checks if the candy block is adjacent to another candy block of the same type
+        
+        //List<CandyGridCellPosition> adjacentCandyBlockList = new List<CandyGridCellPosition>();
+        
+        if (IsValidPosition(x,y) == false)
+        {
+            return null;
+        }
+        if (IsValidPosition(x, y))//&& visited[x,y] ==false)
+        {   visited[x, y] = true;
+            candyGridCellPositions.Add(grid.GetGridObject(x, y));
+            if (IsValidPosition(x,y+1) && visited[x,y+1]==false)
+            {
+                visited[x, y + 1] = true;
+                if (GetCandyBlockSO(x,y+1) == candyBlockSO)
+                {   //Debug.Log(grid.GetGridObject(x,y-1));
+                    candyGridCellPositions.Add(grid.GetGridObject(x, y+1));
+                    //Debug.Log(grid.GetGridObject(x, y+1).GetX() + grid.GetGridObject(x, y+1).GetY() + grid.GetGridObject(x, y+1).GetCandyBlock().GetCandyBlockSO().candyName);
+                    AdjacentCandyGridCellPositionsSameColor(x, y+1, ref candyGridCellPositions, ref visited,candyBlockSO);
+                }
+            }
+            if (IsValidPosition(x+1,y) && visited[x+1,y]==false)
+            {
+                visited[x+1, y] = true;
+                if (GetCandyBlockSO(x+1,y) == candyBlockSO)
+                {   //Debug.Log(grid.GetGridObject(x,y-1));
+                    candyGridCellPositions.Add(grid.GetGridObject(x+1, y));
+                    AdjacentCandyGridCellPositionsSameColor(x+1, y, ref candyGridCellPositions, ref visited,candyBlockSO);
+                }
+            }
+            if (IsValidPosition(x,y-1) && visited[x,y-1]==false)
+            {
+                visited[x, y - 1] = true;
+                if (GetCandyBlockSO(x,y-1) == candyBlockSO)
+                {
+                    candyGridCellPositions.Add(grid.GetGridObject(x, y-1));
+                    //Debug.Log(grid.GetGridObject(x,y-1));
+                    AdjacentCandyGridCellPositionsSameColor(x, y-1, ref candyGridCellPositions, ref visited,candyBlockSO);
+                }
+            }
+            
+            if (IsValidPosition(x-1,y) && visited[x-1,y]==false)
+            {
+                visited[x-1, y] = true;
+                if (GetCandyBlockSO(x-1,y) == candyBlockSO)
+                {   //Debug.Log(grid.GetGridObject(x,y-1));
+                    candyGridCellPositions.Add(grid.GetGridObject(x-1, y));
+                    AdjacentCandyGridCellPositionsSameColor(x-1, y, ref candyGridCellPositions, ref visited,candyBlockSO);
+                }
+            }
+            
+        }
+
+        List<CandyGridCellPosition> a = candyGridCellPositions.Distinct().ToList();
+        //Debug.Log(a.Count + " candyGridCellPositions.Count");
+        
+        return a;
+    }
+    
+    public void DestroyConnectedSameColorCandyBlocks(int x, int y)
+    {   //this method is responsible for destroying connected same color candy blocks
+        List<CandyGridCellPosition> connectedSameColorCandyBlocks = new List<CandyGridCellPosition>();
+        //connectedSameColorCandyBlocks = this.AdjacentCandyGridCellPositionsSameColor(x,y);
+        connectedSameColorCandyBlocks = GetConnectedSameColorCandyBlocks(x,y);
+        int connectedSameColorCandyBlockAmount = connectedSameColorCandyBlocks.Distinct().ToList().Count;
+        if (connectedSameColorCandyBlockAmount >= 2)
+        {   Debug.Log("connectedSameColorCandyBlockAmount: " + connectedSameColorCandyBlockAmount);
+            foreach (var candyGridCellPosition in connectedSameColorCandyBlocks)
+            {   
+                candyGridCellPosition.DestroyCandyBlock();
+                candyGridCellPosition.DestroyGlass();
+                OnGlassDestroyed?.Invoke(this, EventArgs.Empty);
+                OnCandyGridPositionDestroyed?.Invoke(candyGridCellPosition, EventArgs.Empty);
+                candyGridCellPosition.ClearCandyBlock();
+                
             }
         }
-        return candyGridCellPositions;
     }
+    public void DestroyAllCandyBlocks()
+    {   //this method is responsible for destroying all candy blocks
+        for (int x = 0; x < columns; x++)
+        {
+            for (int y = 0; y < rows; y++)
+            {
+                CandyGridCellPosition candyGridCellPosition = grid.GetGridObject(x, y);
+                candyGridCellPosition.DestroyCandyBlock();
+                OnCandyGridPositionDestroyed?.Invoke(candyGridCellPosition, EventArgs.Empty);
+                candyGridCellPosition.ClearCandyBlock();
+                
+            }
+        }
+        SpawnNewMissingGridPositions();
+    }
+    
+    
     public List<CandyGridCellPosition> AdjacentCandyGridCellPositionsSameColor(int x, int  y )
     {   //this method checks if the candy block is adjacent to another candy block of the same type
         CandyBlockSO candyBlockSO = GetCandyBlockSO(x, y);
@@ -345,39 +476,6 @@ public class GridLogicSystem : MonoBehaviour
         }
         return adjacentCandyBlockList;
     }
-    public void DestroyConnectedSameColorCandyBlocks(int x, int y)
-    {   //this method is responsible for destroying connected same color candy blocks
-        List<CandyGridCellPosition> connectedSameColorCandyBlocks = new List<CandyGridCellPosition>();
-        //connectedSameColorCandyBlocks = this.AdjacentCandyGridCellPositionsSameColor(x,y);
-        connectedSameColorCandyBlocks = GetConnectedSameColorCandyBlocks(x,y);
-        int connectedSameColorCandyBlockAmount = connectedSameColorCandyBlocks.Count;
-        if (connectedSameColorCandyBlockAmount >= 2)
-        { foreach (var candyGridCellPosition in connectedSameColorCandyBlocks)
-            {   
-                candyGridCellPosition.DestroyCandyBlock();
-                candyGridCellPosition.DestroyGlass();
-                OnGlassDestroyed?.Invoke(this, EventArgs.Empty);
-                OnCandyGridPositionDestroyed?.Invoke(candyGridCellPosition, EventArgs.Empty);
-                candyGridCellPosition.ClearCandyBlock();
-                
-            }
-        }
-    }
-    public void DestroyAllCandyBlocks()
-    {   //this method is responsible for destroying all candy blocks
-        for (int x = 0; x < columns; x++)
-        {
-            for (int y = 0; y < rows; y++)
-            {
-                CandyGridCellPosition candyGridCellPosition = grid.GetGridObject(x, y);
-                candyGridCellPosition.DestroyCandyBlock();
-                OnCandyGridPositionDestroyed?.Invoke(candyGridCellPosition, EventArgs.Empty);
-                candyGridCellPosition.ClearCandyBlock();
-                
-            }
-        }
-        SpawnNewMissingGridPositions();
-    }
     public bool HasAnyConnectedSameColorCandyBlocks(int x, int y)
     {   //this method checks if there are any connected same color candy blocks
         int connectedSameColorCandyBlockAmount = 0;
@@ -391,4 +489,47 @@ public class GridLogicSystem : MonoBehaviour
             return false;
         }
     }
+    
+    private CandyBlockSO GetCandyBlockSO(int x, int y) 
+    {
+        if (!IsValidPosition(x, y))
+        {
+            return null;
+        }
+        CandyGridCellPosition candyGridCellPosition = grid.GetGridObject(x, y);
+
+        if (candyGridCellPosition.GetCandyBlock() == null)
+        {
+            return null;
+        }
+        return candyGridCellPosition.GetCandyBlock().GetCandyBlockSO();
+    }
+    public int GetScore() {
+        return score;
+    } //returns the score
+    public bool HasMoveAvailable() {
+        return moveCount > 0;
+    } //returns true if there are moves available
+    public int GetMoveCount() {
+        return moveCount;
+    } //returns the move count
+    public int GetUsedMoveCount() {
+        return levelSO.moveAmount - moveCount;
+    } //returns the used move count
+    public void UseMove() {
+        moveCount--;
+        OnMoveUsed?.Invoke(this, EventArgs.Empty);
+    } //decreses the move count by 1
+    public int GetGlassAmount() {
+        int glassAmount = 0;
+        for (int x = 0; x < columns; x++) {
+            for (int y = 0; y < rows; y++) {
+                CandyGridCellPosition candyGridCellPosition = grid.GetGridObject(x, y);
+                if (candyGridCellPosition.HasGlass()) {
+                    glassAmount++;
+                }
+            }
+        }
+        return glassAmount;
+    } //returns the amount of glass blocks in the grid
 }
