@@ -43,7 +43,6 @@ public class GridVisualSystem : MonoBehaviour
     {
         FunctionTimer.Create(() => Setup(sender as GridLogicSystem,e.grid), .1f); //we set up the grid after 0.1 seconds
     }
-
     public void Setup(GridLogicSystem gridLogicSystem, GridXY<CandyGridCellPosition> grid)
     {
         this.gridLogicSystem = gridLogicSystem;
@@ -86,12 +85,11 @@ public class GridVisualSystem : MonoBehaviour
             }
         }
         this.gridLogicSystem.ChangeIconBasedOnSameColorConnectedGroups();
-
+        Debug.Log(gridLogicSystem.GetAllPossibleMoves().Count.ToString());
         SetBusyState(0.1f, () => SetState(State.BeforePlayerTurn));
         isSetup= true;
 
     }
-    
     private void GridLogicSystem_OnCandyGridPositionDestroyed(object sender, EventArgs e)
     {   
         CandyGridCellPosition candyGridCellPosition = sender as CandyGridCellPosition;
@@ -190,12 +188,11 @@ public class GridVisualSystem : MonoBehaviour
         this.state = state;
         OnStateChanged?.Invoke(this, EventArgs.Empty);
     }
-
     public State GetState() {
         return state;
     }
 
-    #region CandyGridVisual
+    
 
     public class CandyGridVisual
     {
@@ -203,8 +200,6 @@ public class GridVisualSystem : MonoBehaviour
         private CandyOnGridCell candyOnGridCell;
         private GridLogicSystem gridLogicSystem;
         private int IconLevel;
-        
-
 
         public CandyGridVisual(Transform transform, CandyOnGridCell candyOnGridCell, GridLogicSystem gridLogicSystem)
         {
@@ -238,10 +233,6 @@ public class GridVisualSystem : MonoBehaviour
         }
         
     }
-
-    #endregion
-
-    #region GlassGridVisual
     public class GlassGridVisual
     {
         private Transform transform;
@@ -263,8 +254,4 @@ public class GridVisualSystem : MonoBehaviour
         }
     }
     
-
-    #endregion
-    
-
 }
