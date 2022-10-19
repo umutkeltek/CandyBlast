@@ -3,16 +3,20 @@ using UnityEngine;
 
 //This script is responsible for scoring and ending the game
 public class LevelManager : MonoSingleton<LevelManager>
-{
+{   
 
     [SerializeField] GridLogicSystem gridLogicSystem;
-
+    
 
     private int _score;
     private int _moveCount;
     private int _targetScore;
     private int _glassCount;
     private LevelSO.WinCondition _winCondition;
+    
+    public event EventHandler OnMoveCountChanged;
+    public event EventHandler OnScoreAmountAdded;
+    public event EventHandler OnCurrentGlassCountChanged;
     public event EventHandler OnWin;
     public event EventHandler OnLose;
 
@@ -25,6 +29,7 @@ public class LevelManager : MonoSingleton<LevelManager>
         _moveCount = gridLogicSystem.GetLevelSo().moveAmount;
         _targetScore = gridLogicSystem.GetLevelSo().targetScore;
         _glassCount = GetGlassAmount(gridLogicSystem.Grid);
+        OnCurrentGlassCountChanged?.Invoke(this, EventArgs.Empty);
         
         if (_winCondition == LevelSO.WinCondition.ReachSpecificScore)
         {   
@@ -41,15 +46,18 @@ public class LevelManager : MonoSingleton<LevelManager>
     private void OnGlassDestroyed(object sender, EventArgs e)
     {   
         _glassCount--;
+        OnCurrentGlassCountChanged?.Invoke(this, EventArgs.Empty);
     }
     private void OnScoreChanged(object sender, GridLogicSystem.OnScoreChangedEventArgs e)
     {
         _score += e.score;
+        OnScoreAmountAdded?.Invoke(this, EventArgs.Empty);
     }
 
     private void OnMoveUsed(object sender, EventArgs e)
-    {   Debug.Log("Move Used");
+    {   //Debug.Log("Move Used");
         _moveCount--;
+        OnMoveCountChanged?.Invoke(this, EventArgs.Empty);
     }
     
     public bool WinConditionCheck()
@@ -80,34 +88,6 @@ public class LevelManager : MonoSingleton<LevelManager>
         {   Debug.Log("Lose");
             OnLose?.Invoke(this, EventArgs.Empty);
         }
-        /*if (!HasMoveAvailable()) 
-        {   
-            switch (_winCondition) 
-            {
-                case LevelSO.WinCondition.ReachSpecificScore:
-                    if (_score >= _targetScore) {
-                        // Reached Target Score!
-                        OnWin?.Invoke(this, EventArgs.Empty);
-                        return true;
-                    }
-                    break;
-                break;
-                case LevelSO.WinCondition.RemoveAllGlassBlocks:
-                    if (_glassCount <= 0) {
-                        // All glass destroyed!
-                        OnWin?.Invoke(this, EventArgs.Empty);
-                        return true;
-                    }
-                    break;
-                break;
-            }
-            OnLose?.Invoke(this, EventArgs.Empty);
-            // No more moves, game over!
-            return true;
-        }
-        // Not game over
-        return false;
-    }*/
     }
 
     //returns the amount of glass blocks in the grid
@@ -121,8 +101,13 @@ public class LevelManager : MonoSingleton<LevelManager>
                 }
             }
         }
+        
+        
         return glassAmount;
     } //returns the amount of glass blocks in the grid
+    public int GetCurrentGlassAmount() {
+        return _glassCount;
+    }
     public bool HasMoveAvailable() {
         return _moveCount > 0;
     } //returns true if there are moves available
