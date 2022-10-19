@@ -81,11 +81,11 @@ public class LevelManager : MonoSingleton<LevelManager>
     public void TryIsGameOver()
     {
         if (WinConditionCheck())
-        {   Debug.Log("win");
+        {   //Debug.Log("win");
             OnWin?.Invoke(this, EventArgs.Empty);
         }
         else if (!HasMoveAvailable())
-        {   Debug.Log("Lose");
+        {   //Debug.Log("Lose");
             OnLose?.Invoke(this, EventArgs.Empty);
         }
     }

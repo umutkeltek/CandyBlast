@@ -188,10 +188,10 @@ public class GameStateManager : MonoSingleton<GameStateManager>
                 });
                 break;
             case GameState.GameOver:
-                Debug.Log("Game Over");
+                //Debug.Log("Game Over");
                 break;
             case GameState.Victory:
-                Debug.Log("Victory");
+                //Debug.Log("Victory");
                 break;
 
 

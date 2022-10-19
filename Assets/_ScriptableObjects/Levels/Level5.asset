@@ -27,35 +27,35 @@ MonoBehaviour:
     x: 0
     y: 1
     hasGlass: 0
-  - candyBlockSO: {fileID: 11400000, guid: 608afc4d30ab9774ea359c9f400d5be9, type: 2}
+  - candyBlockSO: {fileID: 11400000, guid: f5ec97955cffa2b44bd23f978372cebf, type: 2}
     x: 0
     y: 2
     hasGlass: 0
-  - candyBlockSO: {fileID: 11400000, guid: afd5ce3b3218b6c4b813bdfb61049ba2, type: 2}
+  - candyBlockSO: {fileID: 11400000, guid: b95f8d898ae971949a6a61fb3dd709ac, type: 2}
     x: 0
     y: 3
-    hasGlass: 0
-  - candyBlockSO: {fileID: 11400000, guid: afd5ce3b3218b6c4b813bdfb61049ba2, type: 2}
-    x: 0
-    y: 4
-    hasGlass: 0
-  - candyBlockSO: {fileID: 11400000, guid: afd5ce3b3218b6c4b813bdfb61049ba2, type: 2}
-    x: 0
-    y: 5
-    hasGlass: 0
-  - candyBlockSO: {fileID: 11400000, guid: a3a396054bf714549bea04accfc6e817, type: 2}
-    x: 0
-    y: 6
     hasGlass: 0
   - candyBlockSO: {fileID: 11400000, guid: f5ec97955cffa2b44bd23f978372cebf, type: 2}
     x: 0
+    y: 4
+    hasGlass: 1
+  - candyBlockSO: {fileID: 11400000, guid: afd5ce3b3218b6c4b813bdfb61049ba2, type: 2}
+    x: 0
+    y: 5
+    hasGlass: 0
+  - candyBlockSO: {fileID: 11400000, guid: a3a396054bf714549bea04accfc6e817, type: 2}
+    x: 0
+    y: 6
+    hasGlass: 0
+  - candyBlockSO: {fileID: 11400000, guid: afd5ce3b3218b6c4b813bdfb61049ba2, type: 2}
+    x: 0
     y: 7
     hasGlass: 0
   - candyBlockSO: {fileID: 11400000, guid: afd5ce3b3218b6c4b813bdfb61049ba2, type: 2}
     x: 1
     y: 0
     hasGlass: 0
-  - candyBlockSO: {fileID: 11400000, guid: afd5ce3b3218b6c4b813bdfb61049ba2, type: 2}
+  - candyBlockSO: {fileID: 11400000, guid: b95f8d898ae971949a6a61fb3dd709ac, type: 2}
     x: 1
     y: 1
     hasGlass: 0
@@ -63,87 +63,87 @@ MonoBehaviour:
     x: 1
     y: 2
     hasGlass: 0
-  - candyBlockSO: {fileID: 11400000, guid: f5ec97955cffa2b44bd23f978372cebf, type: 2}
+  - candyBlockSO: {fileID: 11400000, guid: b95f8d898ae971949a6a61fb3dd709ac, type: 2}
     x: 1
     y: 3
-    hasGlass: 0
-  - candyBlockSO: {fileID: 11400000, guid: f5ec97955cffa2b44bd23f978372cebf, type: 2}
-    x: 1
-    y: 4
-    hasGlass: 0
+    hasGlass: 1
   - candyBlockSO: {fileID: 11400000, guid: afd5ce3b3218b6c4b813bdfb61049ba2, type: 2}
     x: 1
+    y: 4
+    hasGlass: 1
+  - candyBlockSO: {fileID: 11400000, guid: b95f8d898ae971949a6a61fb3dd709ac, type: 2}
+    x: 1
     y: 5
-    hasGlass: 0
+    hasGlass: 1
   - candyBlockSO: {fileID: 11400000, guid: afd5ce3b3218b6c4b813bdfb61049ba2, type: 2}
     x: 1
     y: 6
     hasGlass: 0
-  - candyBlockSO: {fileID: 11400000, guid: a3a396054bf714549bea04accfc6e817, type: 2}
+  - candyBlockSO: {fileID: 11400000, guid: f5ec97955cffa2b44bd23f978372cebf, type: 2}
     x: 1
     y: 7
     hasGlass: 0
-  - candyBlockSO: {fileID: 11400000, guid: b95f8d898ae971949a6a61fb3dd709ac, type: 2}
+  - candyBlockSO: {fileID: 11400000, guid: f5ec97955cffa2b44bd23f978372cebf, type: 2}
     x: 2
     y: 0
     hasGlass: 0
-  - candyBlockSO: {fileID: 11400000, guid: b95f8d898ae971949a6a61fb3dd709ac, type: 2}
+  - candyBlockSO: {fileID: 11400000, guid: afd5ce3b3218b6c4b813bdfb61049ba2, type: 2}
     x: 2
     y: 1
-    hasGlass: 0
+    hasGlass: 1
   - candyBlockSO: {fileID: 11400000, guid: 608afc4d30ab9774ea359c9f400d5be9, type: 2}
     x: 2
     y: 2
-    hasGlass: 0
-  - candyBlockSO: {fileID: 11400000, guid: f5ec97955cffa2b44bd23f978372cebf, type: 2}
+    hasGlass: 1
+  - candyBlockSO: {fileID: 11400000, guid: b95f8d898ae971949a6a61fb3dd709ac, type: 2}
     x: 2
     y: 3
-    hasGlass: 0
+    hasGlass: 1
   - candyBlockSO: {fileID: 11400000, guid: 608afc4d30ab9774ea359c9f400d5be9, type: 2}
     x: 2
     y: 4
-    hasGlass: 0
-  - candyBlockSO: {fileID: 11400000, guid: b95f8d898ae971949a6a61fb3dd709ac, type: 2}
+    hasGlass: 1
+  - candyBlockSO: {fileID: 11400000, guid: 608afc4d30ab9774ea359c9f400d5be9, type: 2}
     x: 2
     y: 5
-    hasGlass: 0
+    hasGlass: 1
   - candyBlockSO: {fileID: 11400000, guid: afd5ce3b3218b6c4b813bdfb61049ba2, type: 2}
     x: 2
     y: 6
     hasGlass: 0
-  - candyBlockSO: {fileID: 11400000, guid: f5ec97955cffa2b44bd23f978372cebf, type: 2}
+  - candyBlockSO: {fileID: 11400000, guid: a3a396054bf714549bea04accfc6e817, type: 2}
     x: 2
     y: 7
     hasGlass: 0
-  - candyBlockSO: {fileID: 11400000, guid: b95f8d898ae971949a6a61fb3dd709ac, type: 2}
+  - candyBlockSO: {fileID: 11400000, guid: afd5ce3b3218b6c4b813bdfb61049ba2, type: 2}
     x: 3
     y: 0
     hasGlass: 0
-  - candyBlockSO: {fileID: 11400000, guid: afd5ce3b3218b6c4b813bdfb61049ba2, type: 2}
+  - candyBlockSO: {fileID: 11400000, guid: f5ec97955cffa2b44bd23f978372cebf, type: 2}
     x: 3
     y: 1
     hasGlass: 0
-  - candyBlockSO: {fileID: 11400000, guid: b95f8d898ae971949a6a61fb3dd709ac, type: 2}
+  - candyBlockSO: {fileID: 11400000, guid: f5ec97955cffa2b44bd23f978372cebf, type: 2}
     x: 3
     y: 2
     hasGlass: 0
-  - candyBlockSO: {fileID: 11400000, guid: f5ec97955cffa2b44bd23f978372cebf, type: 2}
+  - candyBlockSO: {fileID: 11400000, guid: afd5ce3b3218b6c4b813bdfb61049ba2, type: 2}
     x: 3
     y: 3
-    hasGlass: 0
+    hasGlass: 1
   - candyBlockSO: {fileID: 11400000, guid: afd5ce3b3218b6c4b813bdfb61049ba2, type: 2}
     x: 3
     y: 4
     hasGlass: 0
-  - candyBlockSO: {fileID: 11400000, guid: a3a396054bf714549bea04accfc6e817, type: 2}
+  - candyBlockSO: {fileID: 11400000, guid: b95f8d898ae971949a6a61fb3dd709ac, type: 2}
     x: 3
     y: 5
     hasGlass: 0
-  - candyBlockSO: {fileID: 11400000, guid: f5ec97955cffa2b44bd23f978372cebf, type: 2}
+  - candyBlockSO: {fileID: 11400000, guid: afd5ce3b3218b6c4b813bdfb61049ba2, type: 2}
     x: 3
     y: 6
     hasGlass: 0
-  - candyBlockSO: {fileID: 11400000, guid: b95f8d898ae971949a6a61fb3dd709ac, type: 2}
+  - candyBlockSO: {fileID: 11400000, guid: f5ec97955cffa2b44bd23f978372cebf, type: 2}
     x: 3
     y: 7
     hasGlass: 0
@@ -158,24 +158,24 @@ MonoBehaviour:
   - candyBlockSO: {fileID: 11400000, guid: afd5ce3b3218b6c4b813bdfb61049ba2, type: 2}
     x: 4
     y: 2
-    hasGlass: 0
-  - candyBlockSO: {fileID: 11400000, guid: f5ec97955cffa2b44bd23f978372cebf, type: 2}
+    hasGlass: 1
+  - candyBlockSO: {fileID: 11400000, guid: b95f8d898ae971949a6a61fb3dd709ac, type: 2}
     x: 4
     y: 3
-    hasGlass: 0
+    hasGlass: 1
   - candyBlockSO: {fileID: 11400000, guid: b95f8d898ae971949a6a61fb3dd709ac, type: 2}
     x: 4
     y: 4
     hasGlass: 0
-  - candyBlockSO: {fileID: 11400000, guid: a3a396054bf714549bea04accfc6e817, type: 2}
+  - candyBlockSO: {fileID: 11400000, guid: b95f8d898ae971949a6a61fb3dd709ac, type: 2}
     x: 4
     y: 5
     hasGlass: 0
-  - candyBlockSO: {fileID: 11400000, guid: afd5ce3b3218b6c4b813bdfb61049ba2, type: 2}
+  - candyBlockSO: {fileID: 11400000, guid: f5ec97955cffa2b44bd23f978372cebf, type: 2}
     x: 4
     y: 6
     hasGlass: 0
-  - candyBlockSO: {fileID: 11400000, guid: f5ec97955cffa2b44bd23f978372cebf, type: 2}
+  - candyBlockSO: {fileID: 11400000, guid: afd5ce3b3218b6c4b813bdfb61049ba2, type: 2}
     x: 4
     y: 7
     hasGlass: 0
@@ -191,7 +191,7 @@ MonoBehaviour:
     x: 5
     y: 2
     hasGlass: 0
-  - candyBlockSO: {fileID: 11400000, guid: 608afc4d30ab9774ea359c9f400d5be9, type: 2}
+  - candyBlockSO: {fileID: 11400000, guid: b95f8d898ae971949a6a61fb3dd709ac, type: 2}
     x: 5
     y: 3
     hasGlass: 0
@@ -207,7 +207,7 @@ MonoBehaviour:
     x: 5
     y: 6
     hasGlass: 0
-  - candyBlockSO: {fileID: 11400000, guid: a3a396054bf714549bea04accfc6e817, type: 2}
+  - candyBlockSO: {fileID: 11400000, guid: f5ec97955cffa2b44bd23f978372cebf, type: 2}
     x: 5
     y: 7
     hasGlass: 0
@@ -239,7 +239,7 @@ MonoBehaviour:
     x: 6
     y: 6
     hasGlass: 0
-  - candyBlockSO: {fileID: 11400000, guid: 608afc4d30ab9774ea359c9f400d5be9, type: 2}
+  - candyBlockSO: {fileID: 11400000, guid: a3a396054bf714549bea04accfc6e817, type: 2}
     x: 6
     y: 7
     hasGlass: 0
@@ -259,7 +259,7 @@ MonoBehaviour:
     x: 7
     y: 3
     hasGlass: 0
-  - candyBlockSO: {fileID: 11400000, guid: b95f8d898ae971949a6a61fb3dd709ac, type: 2}
+  - candyBlockSO: {fileID: 11400000, guid: afd5ce3b3218b6c4b813bdfb61049ba2, type: 2}
     x: 7
     y: 4
     hasGlass: 0
@@ -271,7 +271,7 @@ MonoBehaviour:
     x: 7
     y: 6
     hasGlass: 0
-  - candyBlockSO: {fileID: 11400000, guid: b95f8d898ae971949a6a61fb3dd709ac, type: 2}
+  - candyBlockSO: {fileID: 11400000, guid: f5ec97955cffa2b44bd23f978372cebf, type: 2}
     x: 7
     y: 7
     hasGlass: 0
