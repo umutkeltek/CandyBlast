@@ -34,7 +34,7 @@ public class GridXY<TGridObject> // Generic class to create grid in XY axis
             }
         }
         
-        bool showDebug = true;
+        bool showDebug = false;
         if (showDebug)
         {
             TextMesh[,] debugTextArray = new TextMesh[columns, rows];

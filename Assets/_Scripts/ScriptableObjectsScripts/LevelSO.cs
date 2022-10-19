@@ -19,6 +19,10 @@ public class LevelSO : ScriptableObject
     public int moveAmount;
     public int targetScore;
     public WinCondition winCondition;
+    [Header("Conditions To Change Icon Level")]
+    public int conditionThreshold1; 
+    public int condition2;
+    public int condition3;
     
     
     [System.Serializable]
