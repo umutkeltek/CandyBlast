@@ -1,10 +1,6 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using CodeMonkey.Utils;
 using TMPro;
-using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
 //This is the class is responsible for creating level design for the real game. It is not the actual game. Desired elements are adjusted and saved into LevelSO s
@@ -20,16 +16,16 @@ public class LevelEditor : MonoBehaviour
 
     
     
-    private Vector3 mousePosition;
-    private Vector3 mousePositionWorld;
+    private Vector3 _mousePosition;
+    private Vector3 _mousePositionWorld;
 
-    private GridXY<GridPosition> grid;
+    private GridXY<GridPosition> _grid;
     
     
     
     private void Awake()
     {
-        grid = new GridXY<GridPosition>(levelSo.columns, levelSo.rows, 2.2f, Vector3.zero, (GridXY<GridPosition> g, int x, int y) => new GridPosition(levelSo, g, x, y));
+        _grid = new GridXY<GridPosition>(levelSo.columns, levelSo.rows, 2.2f, Vector3.zero, (GridXY<GridPosition> g, int x, int y) => new GridPosition(levelSo, g, x, y));
         levelText.text = levelSo.name;
         
         
@@ -38,16 +34,16 @@ public class LevelEditor : MonoBehaviour
         {
             Debug.Log("Creating new level...");
             levelSo.candyGridPositionsList = new List<LevelSO.LevelGridPosition>();
-            for (int x = 0; x < grid.GetColumnsCount(); x++)
+            for (int x = 0; x < _grid.GetColumnsCount(); x++)
             {
-                for (int y = 0; y < grid.GetRowsCount(); y++)
+                for (int y = 0; y < _grid.GetRowsCount(); y++)
                 {
                     CandyBlockSO candyBlock = levelSo.candyBlocksList[Random.Range(0,levelSo.candyBlocksList.Count)];
                     LevelSO.LevelGridPosition levelGridPosition = new LevelSO.LevelGridPosition{candyBlockSO = candyBlock, x = x, y = y};
                     levelSo.candyGridPositionsList.Add(levelGridPosition);
                     
-                    CreateVisual(grid.GetGridObject(x,y),levelGridPosition);
-                    grid.GetGridObject(x,y).spriteRenderer.sortingOrder = y;
+                    CreateVisual(_grid.GetGridObject(x,y),levelGridPosition);
+                    _grid.GetGridObject(x,y).SpriteRenderer.sortingOrder = y;
                 }
             }
             
@@ -55,9 +51,9 @@ public class LevelEditor : MonoBehaviour
         else
         {
             Debug.Log("loading level...");
-            for (int x = 0; x < grid.GetColumnsCount(); x++)
+            for (int x = 0; x < _grid.GetColumnsCount(); x++)
             {
-                for (int y = 0; y < grid.GetRowsCount(); y++)
+                for (int y = 0; y < _grid.GetRowsCount(); y++)
                 {
                     LevelSO.LevelGridPosition levelGridPosition = null;
                     foreach (LevelSO.LevelGridPosition tempLevelGridPosition in levelSo.candyGridPositionsList)
@@ -72,8 +68,8 @@ public class LevelEditor : MonoBehaviour
                     {
                         Debug.LogError("LevelGridPosition not found");
                     }
-                    CreateVisual(grid.GetGridObject(x,y), levelGridPosition);
-                    grid.GetGridObject(x,y).spriteRenderer.sortingOrder = y;
+                    CreateVisual(_grid.GetGridObject(x,y), levelGridPosition);
+                    _grid.GetGridObject(x,y).SpriteRenderer.sortingOrder = y;
                 }
             }
         }
@@ -92,14 +88,14 @@ public class LevelEditor : MonoBehaviour
     
     private void SetCameraOrthoSize()
     {
-        var desiredCameraWidth = grid.GetColumnsCount() * 256f / 48f;
-        float screenRatio = (float)Screen.width / (float)Screen.height;
+        var desiredCameraWidth = _grid.GetColumnsCount() * 256f / 48f;
+        float screenRatio = Screen.width / (float)Screen.height;
         var desiredCameraHeight = desiredCameraWidth / screenRatio;
         Camera.main.orthographicSize = desiredCameraHeight / 2f;
         cameraTransform.position = CalculateOrthoSize(
-            grid.GetWorldPosition(0, 0) - new Vector3(grid.GetCellSize(), grid.GetCellSize()),
-            grid.GetWorldPosition(grid.GetColumnsCount() - 1, grid.GetRowsCount() - 1) +
-            new Vector3(grid.GetCellSize(), grid.GetCellSize())).center + Vector3.right * 1.22f + new Vector3(0,grid.GetCellSize()/2.56f,-10);
+            _grid.GetWorldPosition(0, 0) - new Vector3(_grid.GetCellSize(), _grid.GetCellSize()),
+            _grid.GetWorldPosition(_grid.GetColumnsCount() - 1, _grid.GetRowsCount() - 1) +
+            new Vector3(_grid.GetCellSize(), _grid.GetCellSize())).center + Vector3.right * 1.22f + new Vector3(0,_grid.GetCellSize()/2.56f,-10);
         
         
     }
@@ -109,11 +105,12 @@ public class LevelEditor : MonoBehaviour
 
     private void Update()
     {
-        mousePosition = Input.mousePosition;
-        mousePositionWorld = Camera.main.ScreenToWorldPoint(mousePosition);
-        mousePositionWorld.z = Camera.main.nearClipPlane -3f;
-        grid.GetXY(mousePositionWorld, out int x, out int y);
-        if (x<0 || y<0 || x>=grid.GetColumnsCount() || y>=grid.GetRowsCount())
+        _mousePosition = Input.mousePosition;
+        Camera main;
+        _mousePositionWorld = (main = Camera.main).ScreenToWorldPoint(_mousePosition);
+        _mousePositionWorld.z = main.nearClipPlane -3f;
+        _grid.GetXY(_mousePositionWorld, out int x, out int y);
+        if (x<0 || y<0 || x>=_grid.GetColumnsCount() || y>=_grid.GetRowsCount())
         {
             selectedCell.text = "Out of bounds";
         }
@@ -141,43 +138,43 @@ public class LevelEditor : MonoBehaviour
 
             if (Input.GetKeyDown(KeyCode.Alpha1))
             {
-                grid.GetGridObject(x, y).SetCandySO(levelSo.candyBlocksList[0]);
-                grid.GetGridObject(x, y).spriteRenderer.sortingOrder = y;
+                _grid.GetGridObject(x, y).SetCandySo(levelSo.candyBlocksList[0]);
+                _grid.GetGridObject(x, y).SpriteRenderer.sortingOrder = y;
             }
 
             if (Input.GetKeyDown(KeyCode.Alpha2))
             {
-                grid.GetGridObject(x, y).SetCandySO(levelSo.candyBlocksList[1]);
-                grid.GetGridObject(x, y).spriteRenderer.sortingOrder = y;
+                _grid.GetGridObject(x, y).SetCandySo(levelSo.candyBlocksList[1]);
+                _grid.GetGridObject(x, y).SpriteRenderer.sortingOrder = y;
             }
             if (Input.GetKeyDown(KeyCode.Alpha3))
             {
-                grid.GetGridObject(x, y).SetCandySO(levelSo.candyBlocksList[2]);
-                grid.GetGridObject(x, y).spriteRenderer.sortingOrder = y;
+                _grid.GetGridObject(x, y).SetCandySo(levelSo.candyBlocksList[2]);
+                _grid.GetGridObject(x, y).SpriteRenderer.sortingOrder = y;
             }
             if (Input.GetKeyDown(KeyCode.Alpha4))
             {
-                grid.GetGridObject(x, y).SetCandySO(levelSo.candyBlocksList[3]);
-                grid.GetGridObject(x, y).spriteRenderer.sortingOrder = y;
+                _grid.GetGridObject(x, y).SetCandySo(levelSo.candyBlocksList[3]);
+                _grid.GetGridObject(x, y).SpriteRenderer.sortingOrder = y;
             }
             if (Input.GetKeyDown(KeyCode.Alpha5))
             {
-                grid.GetGridObject(x, y).SetCandySO(levelSo.candyBlocksList[4]);
-                grid.GetGridObject(x, y).spriteRenderer.sortingOrder = y;
+                _grid.GetGridObject(x, y).SetCandySo(levelSo.candyBlocksList[4]);
+                _grid.GetGridObject(x, y).SpriteRenderer.sortingOrder = y;
             }
             if (Input.GetKeyDown(KeyCode.Alpha6))
             {
-                grid.GetGridObject(x, y).SetCandySO(levelSo.candyBlocksList[5]);
-                grid.GetGridObject(x, y).spriteRenderer.sortingOrder = y;
+                _grid.GetGridObject(x, y).SetCandySo(levelSo.candyBlocksList[5]);
+                _grid.GetGridObject(x, y).SpriteRenderer.sortingOrder = y;
             }
             
 
             if (Input.GetMouseButtonDown(1)) {
-                grid.GetGridObject(x, y).SetHasGlass(!grid.GetGridObject(x, y).GetHasGlass());
+                _grid.GetGridObject(x, y).SetHasGlass(!_grid.GetGridObject(x, y).GetHasGlass());
             }
         }
     }
-    public LevelSO GetLevelSO()
+    public LevelSO GetLevelSo()
     {
         return levelSo;
     }
@@ -187,18 +184,18 @@ public class LevelEditor : MonoBehaviour
         Transform candyGridVisualTransform = Instantiate(pfCandyGridVisual, gridPosition.GetWorldPosition(), Quaternion.identity);
         Transform glassGridVisualTransform = Instantiate(pfGlassGridVisual, gridPosition.GetWorldPosition(), Quaternion.identity);
         
-        gridPosition.spriteRenderer = candyGridVisualTransform.Find("sprite").GetComponent<SpriteRenderer>();
-        gridPosition.glassVisualGameObject = glassGridVisualTransform.gameObject;
-        gridPosition.levelGridPosition = levelGridPosition;
+        gridPosition.SpriteRenderer = candyGridVisualTransform.Find("sprite").GetComponent<SpriteRenderer>();
+        gridPosition.GlassVisualGameObject = glassGridVisualTransform.gameObject;
+        gridPosition.LevelGridPosition = levelGridPosition;
 
-        gridPosition.SetCandySO(levelGridPosition.candyBlockSO);
+        gridPosition.SetCandySo(levelGridPosition.candyBlockSO);
         gridPosition.SetHasGlass(levelGridPosition.hasGlass);
 
     }
 
     private bool IsValidPosition(int x, int y)
     {
-        if (x < 0 || x >= grid.GetColumnsCount() || y < 0 || y >= grid.GetRowsCount())
+        if (x < 0 || x >= _grid.GetColumnsCount() || y < 0 || y >= _grid.GetRowsCount())
         {
             return false;
         }
@@ -212,47 +209,47 @@ public class LevelEditor : MonoBehaviour
 
     private class GridPosition //Dummy grid position class to create levels using level editor 
     {
-        public SpriteRenderer spriteRenderer;
-        public LevelSO.LevelGridPosition levelGridPosition;
-        public GameObject glassVisualGameObject;
+        public SpriteRenderer SpriteRenderer;
+        public LevelSO.LevelGridPosition LevelGridPosition;
+        public GameObject GlassVisualGameObject;
 
-        private LevelSO levelSO;
-        private GridXY<GridPosition> grid;
-        private int x;
-        private int y;
+        private LevelSO _levelScriptableObject;
+        private GridXY<GridPosition> _grid;
+        private int _x;
+        private int _y;
         
-        public GridPosition(LevelSO levelSO, GridXY<GridPosition> grid, int x, int y)
+        public GridPosition(LevelSO levelScriptableObject, GridXY<GridPosition> grid, int x, int y)
         {
-            this.levelSO = levelSO;
-            this.grid = grid;
-            this.x = x;
-            this.y = y;
+            this._levelScriptableObject = levelScriptableObject;
+            this._grid = grid;
+            this._x = x;
+            this._y = y;
         }
         public Vector3 GetWorldPosition()
         {
-            return grid.GetWorldPosition(x, y);
+            return _grid.GetWorldPosition(_x, _y);
         }
-        public void SetCandySO(CandyBlockSO candySO)
+        public void SetCandySo(CandyBlockSO candySo)
         {
-            spriteRenderer.sprite = candySO.defaultCandySprite;
-            levelGridPosition.candyBlockSO = candySO;
+            SpriteRenderer.sprite = candySo.defaultCandySprite;
+            LevelGridPosition.candyBlockSO = candySo;
             
 #if UNITY_EDITOR
-            UnityEditor.EditorUtility.SetDirty(levelSO);
+            UnityEditor.EditorUtility.SetDirty(_levelScriptableObject);
 #endif
         }
 
         public void SetHasGlass(bool hasGlass)
         {
-            levelGridPosition.hasGlass = hasGlass;
-            glassVisualGameObject.SetActive(hasGlass);
+            LevelGridPosition.hasGlass = hasGlass;
+            GlassVisualGameObject.SetActive(hasGlass);
 #if UNITY_EDITOR
-            UnityEditor.EditorUtility.SetDirty(levelSO);
+            UnityEditor.EditorUtility.SetDirty(_levelScriptableObject);
 #endif
         }
         public bool GetHasGlass()
         {
-            return levelGridPosition.hasGlass;
+            return LevelGridPosition.hasGlass;
         }
     }
 

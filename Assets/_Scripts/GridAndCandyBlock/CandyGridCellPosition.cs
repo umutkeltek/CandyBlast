@@ -1,5 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
+
 using UnityEngine;
 using System;
 
@@ -8,63 +7,63 @@ public class CandyGridCellPosition
 {   
     public event EventHandler OnGlassDestroyed;
     
-    private CandyOnGridCell candyBlock;
-    private GridXY<CandyGridCellPosition> grid;
-    private int x;
-    private int y;
-    private bool hasGlass;
+    private CandyOnGridCell _candyBlock;
+    private GridXY<CandyGridCellPosition> _grid;
+    private int _x;
+    private int _y;
+    private bool _hasGlass;
     
     
     public CandyGridCellPosition(GridXY<CandyGridCellPosition> grid, int x, int y)
     {
-        this.grid = grid;
-        this.x = x;
-        this.y = y;
+        this._grid = grid;
+        this._x = x;
+        this._y = y;
     }
     
     public int GetX()
     {
-        return x;
+        return _x;
     }
     public int GetY()
     {
-        return y;
+        return _y;
     }
     
     public void SetCandyBlock(CandyOnGridCell candyBlock)
     {
-        this.candyBlock = candyBlock;
-        grid.TriggerGridObjectChanged(x,y);
+        this._candyBlock = candyBlock;
+        _grid.TriggerGridObjectChanged(_x,_y);
     }
     
     public CandyOnGridCell GetCandyBlock()
     {
-        return candyBlock;
+        return _candyBlock;
     }
     public void ClearCandyBlock()
     {
-        candyBlock = null;
+        _candyBlock = null;
     }
     public void DestroyCandyBlock()
     {
-        candyBlock?.Destroy();
-        grid.TriggerGridObjectChanged(x,y);
+        _candyBlock?.Destroy();
+        _grid.TriggerGridObjectChanged(_x,_y);
     }
     public bool HasCandyBlock()
     {
-        return candyBlock != null;
+        return _candyBlock != null;
     }
     public bool IsEmpty()
     {
-        return candyBlock == null;
+        return _candyBlock == null;
     }
     public bool HasGlass()
     {
-        return hasGlass;
+        return _hasGlass;
     }
     public void SetHasGlass(bool hasGlass)
     {
-        this.hasGlass = hasGlass;
+        this._hasGlass = hasGlass;
     }
     public void DestroyGlass()
     {
@@ -74,12 +73,12 @@ public class CandyGridCellPosition
 
     public Vector3 GetWorldPosition()
     {
-        return grid.GetWorldPosition(x, y);
+        return _grid.GetWorldPosition(_x, _y);
     }
     
     public override string ToString()
     {
-        return candyBlock?.ToString() ?? "Empty";
+        return _candyBlock?.ToString() ?? "Empty";
     } 
     
     

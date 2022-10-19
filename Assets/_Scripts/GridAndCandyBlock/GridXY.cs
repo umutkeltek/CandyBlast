@@ -105,7 +105,7 @@ public class GridXY<TGridObject> // Generic class to create grid in XY axis
         }
     }
     public void SetGridObject(Vector3 worldPosition, TGridObject value) {
-        GetXY(worldPosition, out int x, out int y); //get the grid coodinates of the world position and store them in x and y
+        GetXY(worldPosition, out int x, out int y); //get the grid coordinates of the world position and store them in x and y
         SetGridObject(x, y, value); // set the desired object at the grid coordinates
     }
     

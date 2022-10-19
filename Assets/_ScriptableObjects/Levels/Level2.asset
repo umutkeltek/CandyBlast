@@ -214,3 +214,6 @@ MonoBehaviour:
   moveAmount: 15
   targetScore: 111
   winCondition: 0
+  conditionThreshold1: 3
+  condition2: 5
+  condition3: 7

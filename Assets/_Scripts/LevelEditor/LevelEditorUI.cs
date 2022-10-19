@@ -10,7 +10,7 @@ public class LevelEditorUI : MonoBehaviour
     [SerializeField] private LevelEditor levelEditor;
     private void Start()
     {   candyGridVisualList = new List<Sprite>();
-        LevelSO levelSO = levelEditor.GetLevelSO();
+        LevelSO levelSO = levelEditor.GetLevelSo();
         for (int i = 0; i <levelSO.candyBlocksList.Count; i++)
         {
             CandyBlockSO candyBlock = levelSO.candyBlocksList[i];
