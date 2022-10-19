@@ -18,7 +18,9 @@ public class LevelSO : ScriptableObject
     public int rows;
     public int moveAmount;
     public int targetScore;
+    public int scorePerCandy;
     public WinCondition winCondition;
+    
     [Header("Conditions To Change Icon Level")]
     public int conditionThreshold1; 
     public int conditionThreshold2;

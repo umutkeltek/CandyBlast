@@ -10,7 +10,6 @@ public class GridVisualSystem : MonoBehaviour
     [SerializeField] private Transform pfCandyGridVisual;
     [SerializeField] private Transform pfGlassGridVisual;
     [SerializeField] private Transform pfBackgroundGridVisual; //it will be used if it is wanted to add a background to the grid
-    [SerializeField] private Transform cameraTransform;
     [SerializeField] public GridLogicSystem gridLogicSystem;
 
     private GridXY<CandyGridCellPosition> _grid;

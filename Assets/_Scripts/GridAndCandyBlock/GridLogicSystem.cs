@@ -9,11 +9,14 @@ public class GridLogicSystem : MonoBehaviour
     public event EventHandler<OnNewCandyGridSpawnedEventArgs> OnNewCandyGridSpawned; //event for when a new candy is spawned
     public event EventHandler<OnLevelSetEventArgs> OnLevelSet; //event for when a level is set
     public event EventHandler OnGlassDestroyed; 
-    public event EventHandler OnMoveUsed; 
-    public event EventHandler OnOutOfMoves;
-    public event EventHandler OnScoreChanged;
-    public event EventHandler OnWin;
+    public event EventHandler OnMoveUsed;
+    public event EventHandler<OnScoreChangedEventArgs>OnScoreChanged;
     
+    
+    public class OnScoreChangedEventArgs : EventArgs
+    {
+        public int score;
+    }
     public class OnNewCandyGridSpawnedEventArgs : EventArgs {
         public CandyOnGridCell CandyOnGridCell;
         public CandyGridCellPosition CandyGridCellPosition;
@@ -37,10 +40,11 @@ public class GridLogicSystem : MonoBehaviour
     private int _level3Icons;
     
     public GridXY<CandyGridCellPosition> Grid;
-    private int _score;
+    
     private int _columns;
     private int _rows;
     private int _moveCount;
+    private int _scorePerCandy;
     
     private void Start()
     {
@@ -48,6 +52,7 @@ public class GridLogicSystem : MonoBehaviour
         {
             SetLevelSo(levelSo);
         }
+        
     }
     public LevelSO GetLevelSo() //returns the scriptable object that stores the level elements.
     {
@@ -98,8 +103,7 @@ public class GridLogicSystem : MonoBehaviour
             }
             
         }
-
-        _score = 0;
+        
         _moveCount = levelScriptableObject.moveAmount;
         OnLevelSet?.Invoke(this, new OnLevelSetEventArgs {LevelSo = levelScriptableObject, Grid = Grid});
         
@@ -259,7 +263,6 @@ public class GridLogicSystem : MonoBehaviour
         //Debug.Log(candyGridCellPositions.Count + " candyGridCellPositions.Count");
         return candyGridCellPositions;
     }
-    
     public void DestroyConnectedSameColorCandyBlocks(int x, int y) //this method is responsible for destroying connected same color candy blocks
     {
         var connectedSameColorCandyBlocks = GetConnectedSameColorCandyBlocks(x,y);
@@ -291,6 +294,9 @@ public class GridLogicSystem : MonoBehaviour
                 OnCandyGridPositionDestroyed?.Invoke(candyGridCellPosition, EventArgs.Empty);
                 candyGridCellPosition.ClearCandyBlock();
             }
+            OnMoveUsed?.Invoke(this, EventArgs.Empty);
+            OnScoreChanged?.Invoke(this, new OnScoreChangedEventArgs{ score = gridCellPositions.Count*100});
+            
     }
     public void DestroyAllCandyBlocks() //this method is responsible for destroying all candy blocks
     {   
@@ -388,35 +394,6 @@ public class GridLogicSystem : MonoBehaviour
         }
         return candyGridCellPosition.GetCandyBlock().GetCandyBlockSo();
     }
-    public int GetScore() {
-        return _score;
-    } //returns the score
-    public bool HasMoveAvailable() {
-        return _moveCount > 0;
-    } //returns true if there are moves available
-    public int GetMoveCount() {
-        return _moveCount;
-    } //returns the move count
-    public int GetUsedMoveCount() {
-        return levelSo.moveAmount - _moveCount;
-    } //returns the used move count
-    public void UseMove() {
-        _moveCount--;
-        OnMoveUsed?.Invoke(this, EventArgs.Empty);
-    } //decreases the move count by 1
-    public int GetGlassAmount() {
-        int glassAmount = 0;
-        for (int x = 0; x < _columns; x++) {
-            for (int y = 0; y < _rows; y++) {
-                CandyGridCellPosition candyGridCellPosition = Grid.GetGridObject(x, y);
-                if (candyGridCellPosition.HasGlass()) {
-                    glassAmount++;
-                }
-            }
-        }
-        return glassAmount;
-    } //returns the amount of glass blocks in the grid
-    
     public void ChangeAllCandyBlocksState()
     {
         List<PossibleMove> possibleMoves = GetAllPossibleMoves();

@@ -212,7 +212,8 @@ MonoBehaviour:
   columns: 6
   rows: 8
   moveAmount: 15
-  targetScore: 111
+  targetScore: 4500
+  scorePerCandy: 100
   winCondition: 0
   conditionThreshold1: 3
   conditionThreshold2: 5

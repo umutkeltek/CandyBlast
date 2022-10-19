@@ -278,9 +278,10 @@ MonoBehaviour:
     hasGlass: 1
   columns: 8
   rows: 8
-  moveAmount: 16
-  targetScore: 5000
-  winCondition: 0
+  moveAmount: 2
+  targetScore: 5400
+  scorePerCandy: 100
+  winCondition: 2
   conditionThreshold1: 3
   conditionThreshold2: 5
   conditionThreshold3: 7

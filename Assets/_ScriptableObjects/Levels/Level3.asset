@@ -84,8 +84,9 @@ MonoBehaviour:
     hasGlass: 0
   columns: 4
   rows: 4
-  moveAmount: 0
-  targetScore: 0
+  moveAmount: 20
+  targetScore: 3000
+  scorePerCandy: 100
   winCondition: 0
   conditionThreshold1: 3
   conditionThreshold2: 5
