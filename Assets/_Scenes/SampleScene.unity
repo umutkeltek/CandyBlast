@@ -387,7 +387,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cellSize: 2.2
   originPosition: {x: 0, y: 0, z: 0}
-  levelSO: {fileID: 11400000, guid: a648a62c83c75e94bacffba1f578c91f, type: 2}
+  levelSo: {fileID: 11400000, guid: a7879d330796f4f48b4b052007d4dd2e, type: 2}
   autoLoadLevel: 1
   level1Icons: 3
   level2Icons: 4

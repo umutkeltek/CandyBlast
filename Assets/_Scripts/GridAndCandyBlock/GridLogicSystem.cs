@@ -30,10 +30,11 @@ public class GridLogicSystem : MonoBehaviour
     [Header("Initializing Level Settings")]
     [SerializeField] private LevelSO levelSo;
     [SerializeField] private bool autoLoadLevel;
-    [Header("Conditions for changing icons")]
-    [SerializeField] private int level1Icons;
-    [SerializeField] private int level2Icons;
-    [SerializeField] private int level3Icons;
+    
+    
+    private int _level1Icons;
+    private int _level2Icons;
+    private int _level3Icons;
     
     public GridXY<CandyGridCellPosition> Grid;
     private int _score;
@@ -58,6 +59,9 @@ public class GridLogicSystem : MonoBehaviour
         this.levelSo = levelScriptableObject;
         _columns = levelScriptableObject.columns;
         _rows = levelScriptableObject.rows;
+        _level1Icons = levelScriptableObject.conditionThreshold1;
+        _level2Icons = levelScriptableObject.conditionThreshold2;
+        _level3Icons = levelScriptableObject.conditionThreshold3;
         
         Grid = new GridXY<CandyGridCellPosition>(levelScriptableObject.columns, levelScriptableObject.rows, cellSize, originPosition,
             (GridXY<CandyGridCellPosition> g, int x, int y) => new CandyGridCellPosition(g, x, y));
@@ -419,11 +423,11 @@ public class GridLogicSystem : MonoBehaviour
         foreach (PossibleMove possibleMove in possibleMoves)
         {
             int iconLevel = 0;
-            if (possibleMove.ConnectedCandyGridCellPositionsCount >= level3Icons)
+            if (possibleMove.ConnectedCandyGridCellPositionsCount >= _level3Icons)
                 iconLevel = 3;
-            else if (possibleMove.ConnectedCandyGridCellPositionsCount >= level2Icons)
+            else if (possibleMove.ConnectedCandyGridCellPositionsCount >= _level2Icons)
                 iconLevel = 2;
-            else if (possibleMove.ConnectedCandyGridCellPositionsCount >= level1Icons)
+            else if (possibleMove.ConnectedCandyGridCellPositionsCount >= _level1Icons)
                 iconLevel = 1;
             foreach (var candyGridCellPosition in possibleMove.ConnectedCandyGridCellPositions)
             {
