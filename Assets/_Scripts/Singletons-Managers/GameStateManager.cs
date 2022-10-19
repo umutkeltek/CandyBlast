@@ -20,6 +20,8 @@ public class GameStateManager : MonoSingleton<GameStateManager>
     private bool _isSetup;
     [SerializeField] private GridLogicSystem gridLogicSystem;
     [SerializeField] private GridVisualSystem gridVisualSystem;
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip[] audioClips;
 
     private void Awake()
     {
@@ -93,9 +95,48 @@ public class GameStateManager : MonoSingleton<GameStateManager>
                     mousePosition.z = 60f;
                     Vector3 worldPosition = Camera.main.ScreenToWorldPoint(mousePosition);
                     gridLogicSystem.Grid.GetXY(worldPosition, out int x, out int y);
-                    
+                    List<CandyGridCellPosition> dummyConnectedSameColorCandyBlocks = gridLogicSystem.GetConnectedSameColorCandyBlocks(x, y);
                     if (gridLogicSystem.HasAnyConnectedSameColorCandyBlocks(x,y))
-                    {   gridLogicSystem.DestroyConnectedSameColorCandyBlocks(x,y);
+                    {   int count = dummyConnectedSameColorCandyBlocks.Count;
+                        switch (count)
+                        {
+                            case 1:
+                                audioSource.PlayOneShot(audioClips[0]);
+                                break;
+                            case 2:
+                                audioSource.PlayOneShot(audioClips[1]);
+                                break;
+                            case 3:
+                                audioSource.PlayOneShot(audioClips[2]);
+                                break;
+                            case 4:
+                                audioSource.PlayOneShot(audioClips[3]);
+                                break;
+                            case 5:
+                                audioSource.PlayOneShot(audioClips[4]);
+                                break;
+                            case 6:
+                                audioSource.PlayOneShot(audioClips[5]);
+                                break;
+                            case 7:
+                                audioSource.PlayOneShot(audioClips[5]);
+                                break;
+                            case 8:
+                                audioSource.PlayOneShot(audioClips[5]);
+                                break;
+                            case 9:
+                                audioSource.PlayOneShot(audioClips[5]);
+                                break;
+                            case 10:
+                                audioSource.PlayOneShot(audioClips[5]);
+                                break;
+                            
+                            default:
+                                audioSource.PlayOneShot(audioClips[0]);
+                                break;
+                        }
+                        
+                        gridLogicSystem.DestroyConnectedSameColorCandyBlocks(x,y);
                         SetBusyState(.1f, () => SetState(GameState.AfterPlayerTurn));
                     }
                 }

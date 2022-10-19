@@ -172,7 +172,7 @@ public class GridLogicSystem : MonoBehaviour
     }
     
     //AdjacentCandyGridCellPositionsSameColor Method needs this method because we are using recursion so we need reference to a list.
-    private List<CandyGridCellPosition> GetConnectedSameColorCandyBlocks(int x, int y)
+    public List<CandyGridCellPosition> GetConnectedSameColorCandyBlocks(int x, int y)
     {   List<CandyGridCellPosition> connectedSameColorGroup = new List<CandyGridCellPosition>();
         CandyBlockSO candyBlockSo = GetCandyBlockSo(x, y);
         if (candyBlockSo == null) { return null; }
@@ -277,6 +277,20 @@ public class GridLogicSystem : MonoBehaviour
                 
             }
         }
+    }
+    public void DestroyConnectedSameColorCandyBlocks(List<CandyGridCellPosition> gridCellPositions) //this method is responsible for destroying connected same color candy blocks
+    {
+        if (gridCellPositions == null) { return; }
+        
+           //Debug.Log("connectedSameColorCandyBlockAmount: " + connectedSameColorCandyBlockAmount);
+            foreach (var candyGridCellPosition in gridCellPositions)
+            {   //Debug.Log("candyGridCellPosition: " + candyGridCellPosition.GetX() + candyGridCellPosition.GetY());
+                candyGridCellPosition.DestroyCandyBlock();
+                candyGridCellPosition.DestroyGlass();
+                OnGlassDestroyed?.Invoke(this, EventArgs.Empty);
+                OnCandyGridPositionDestroyed?.Invoke(candyGridCellPosition, EventArgs.Empty);
+                candyGridCellPosition.ClearCandyBlock();
+            }
     }
     public void DestroyAllCandyBlocks() //this method is responsible for destroying all candy blocks
     {   
