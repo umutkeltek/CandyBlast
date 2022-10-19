@@ -367,7 +367,7 @@ GameObject:
   - component: {fileID: 499315104}
   - component: {fileID: 499315103}
   m_Layer: 0
-  m_Name: a
+  m_Name: Grid Logic System
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -389,9 +389,6 @@ MonoBehaviour:
   originPosition: {x: 0, y: 0, z: 0}
   levelSo: {fileID: 11400000, guid: a7879d330796f4f48b4b052007d4dd2e, type: 2}
   autoLoadLevel: 1
-  level1Icons: 3
-  level2Icons: 4
-  level3Icons: 7
 --- !u!4 &499315104
 Transform:
   m_ObjectHideFlags: 0
@@ -470,7 +467,7 @@ GameObject:
   - component: {fileID: 1051686542}
   - component: {fileID: 1051686546}
   m_Layer: 0
-  m_Name: Plane
+  m_Name: Grid Visual System
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -215,5 +215,5 @@ MonoBehaviour:
   targetScore: 111
   winCondition: 0
   conditionThreshold1: 3
-  condition2: 5
-  condition3: 7
+  conditionThreshold2: 5
+  conditionThreshold3: 7

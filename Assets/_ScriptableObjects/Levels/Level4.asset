@@ -18,7 +18,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 608afc4d30ab9774ea359c9f400d5be9, type: 2}
   - {fileID: 11400000, guid: f5ec97955cffa2b44bd23f978372cebf, type: 2}
   candyGridPositionsList:
-  - candyBlockSO: {fileID: 11400000, guid: a3a396054bf714549bea04accfc6e817, type: 2}
+  - candyBlockSO: {fileID: 11400000, guid: afd5ce3b3218b6c4b813bdfb61049ba2, type: 2}
     x: 0
     y: 0
     hasGlass: 0
@@ -88,5 +88,5 @@ MonoBehaviour:
   targetScore: 0
   winCondition: 0
   conditionThreshold1: 3
-  condition2: 5
-  condition3: 7
+  conditionThreshold2: 5
+  conditionThreshold3: 7

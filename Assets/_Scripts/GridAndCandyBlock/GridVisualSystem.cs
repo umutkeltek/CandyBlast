@@ -5,14 +5,8 @@ using UnityEngine;
 
 //Visual Representation of the grid logic
 public class GridVisualSystem : MonoBehaviour
-{   public event EventHandler OnStateChanged;
-    public enum State
-    {
-        Busy,
-        BeforePlayerTurn,
-        AfterPlayerTurn,
-        GameOver
-    }
+{   
+    public event EventHandler OnVisualSetupComplete; //Event to notify when the visual setup is complete to game manager
     [SerializeField] private Transform pfCandyGridVisual;
     [SerializeField] private Transform pfGlassGridVisual;
     [SerializeField] private Transform pfBackgroundGridVisual; //it will be used if it is wanted to add a background to the grid
@@ -23,25 +17,7 @@ public class GridVisualSystem : MonoBehaviour
     private Dictionary<CandyOnGridCell, CandyGridVisual> _candyGridDictionary;
     private Dictionary<CandyGridCellPosition, GlassGridVisual> _glassGridDictionary;
     
-    private State _state;
-    private bool _isSetup;
-    private float _busyTimer;
-    private Action _onBusyTimerElapsedAction;
-
-    private void Awake()
-    {
-        _state = State.Busy;
-        _isSetup = false;
-        
-        gridLogicSystem.OnLevelSet += GridLogicSystem_OnLevelSet; // we subscribe to the event which notify when level set.
-        
-    }
-    //after getting notified from On levelSet event, we set up the grid after certain time.
-    private void GridLogicSystem_OnLevelSet(object sender, GridLogicSystem.OnLevelSetEventArgs e)
-    {
-        FunctionTimer.Create(() => Setup(sender as GridLogicSystem,e.Grid), .1f); //we set up the grid after 0.1 seconds
-    }
-    private void Setup(GridLogicSystem gridLogicSystem, GridXY<CandyGridCellPosition> grid)
+    public void Setup(GridLogicSystem gridLogicSystem, GridXY<CandyGridCellPosition> grid)
     {
         this.gridLogicSystem = gridLogicSystem;
         this._grid = grid;
@@ -53,24 +29,24 @@ public class GridVisualSystem : MonoBehaviour
         gridLogicSystem.OnNewCandyGridSpawned += GridLogicSystem_OnNewCandyGridSpawned;
         
         
-        _candyGridDictionary = new Dictionary<CandyOnGridCell, CandyGridVisual>();
-        _glassGridDictionary = new Dictionary<CandyGridCellPosition, GlassGridVisual>();
+        _candyGridDictionary = new Dictionary<CandyOnGridCell, CandyGridVisual>(); //we create a dictionary to store the candy grid visual matched with the candy grid logic
+        _glassGridDictionary = new Dictionary<CandyGridCellPosition, GlassGridVisual>(); //we create a dictionary to store the glass grid visual matched with grid cell position
 
         for (int x = 0; x < grid.GetColumnsCount(); x++)
         {
             for (int y = 0; y < grid.GetRowsCount(); y++)
             {
-                CandyGridCellPosition candyGridCellPosition = grid.GetGridObject(x, y);
-                CandyOnGridCell candyOnGridCell = candyGridCellPosition.GetCandyBlock();
+                CandyGridCellPosition candyGridCellPosition = grid.GetGridObject(x, y); //we get the grid cell position from the grid logic system
+                CandyOnGridCell candyOnGridCell = candyGridCellPosition.GetCandyBlock(); //we get the candy block from the grid cell position
 
-                Vector3 position = grid.GetWorldPosition(x, y);
-                position = new Vector3(position.x,position.y);
+                Vector3 position = grid.GetWorldPosition(x, y); //we get the world position of the grid cell position
+                position = new Vector3(position.x,20); //we set the position of the grid cell position to be 20 units above the grid cell position to make it look like it is falling from the sky
                 
                 //VisualTransform
-                Transform candyGridVisualTransform = Instantiate(pfCandyGridVisual, position, Quaternion.identity);
-                candyGridVisualTransform.GetChild(0).GetComponent<SpriteRenderer>().sprite = candyOnGridCell.GetCandyBlockSo().defaultCandySprite;
-                candyGridVisualTransform.GetChild(0).GetComponent<SpriteRenderer>().sortingOrder = y;
-                CandyGridVisual candyGridVisual = new CandyGridVisual(candyGridVisualTransform, candyOnGridCell,gridLogicSystem);
+                Transform candyGridVisualTransform = Instantiate(pfCandyGridVisual, position, Quaternion.identity); //we instantiate the candy grid visual prefab
+                candyGridVisualTransform.GetChild(0).GetComponent<SpriteRenderer>().sprite = candyOnGridCell.GetCandyBlockSo().defaultCandySprite; //we set the sprite of the candy grid visual to be the sprite of the candy block 
+                candyGridVisualTransform.GetChild(0).GetComponent<SpriteRenderer>().sortingOrder = y; //it is set to y otherwise the candy grid visual will be hidden behind the top candy grid visual
+                CandyGridVisual candyGridVisual = new CandyGridVisual(candyGridVisualTransform, candyOnGridCell,gridLogicSystem); //we create a new candy grid visual object and pass the transform, candy block and grid logic system
                 
                 _candyGridDictionary[candyOnGridCell] = candyGridVisual;
                 
@@ -82,92 +58,35 @@ public class GridVisualSystem : MonoBehaviour
                 
             }
         }
-        this.gridLogicSystem.ChangeAllCandyBlocksState();
+        this.gridLogicSystem.ChangeAllCandyBlocksState(); //we change the state of all the candy blocks so icons could change based on the state of the candy block
         //Debug.Log(gridLogicSystem.GetAllPossibleMoves().Count.ToString());
-        SetBusyState(0.1f, () => SetState(State.BeforePlayerTurn));
-        _isSetup= true;
+        OnVisualSetupComplete?.Invoke(this, EventArgs.Empty);
+        
+        
 
     }
+    
+    //whenever a candy block is destroyed, we remove the candy grid visual from the dictionary
     private void GridLogicSystem_OnCandyGridPositionDestroyed(object sender, EventArgs e)
     {
         if (sender is CandyGridCellPosition candyGridCellPosition && candyGridCellPosition.GetCandyBlock() != null)
         {
-            _candyGridDictionary.Remove(candyGridCellPosition.GetCandyBlock());
+            _candyGridDictionary.Remove(candyGridCellPosition.GetCandyBlock()); //we remove the candy grid visual from the dictionary when the candy block is destroyed
         }
     }
-    private void GridLogicSystem_OnNewCandyGridSpawned(object sender, GridLogicSystem.OnNewCandyGridSpawnedEventArgs e)
-    {
+    //whenever new candy spawned we instantiate a new candy grid visual and add to library
+    private void GridLogicSystem_OnNewCandyGridSpawned(object sender, GridLogicSystem.OnNewCandyGridSpawnedEventArgs e) 
+    {   //whenever a new candy block is spawned, we instantiate a new candy grid visual and add it to the dictionary
         Vector3 position = e.CandyGridCellPosition.GetWorldPosition();
-        position = new Vector3(position.x,20);
+        position = new Vector3(position.x,20); //we set the position of the grid cell position to be 20 units above the grid cell position to make it look like it is falling from the sky
         
         Transform candyGridVisualTransform = Instantiate(pfCandyGridVisual, position, Quaternion.identity);
-        candyGridVisualTransform.GetChild(0).GetComponent<SpriteRenderer>().sprite = e.CandyOnGridCell.GetCandyBlockSo().defaultCandySprite;
+        candyGridVisualTransform.GetChild(0).GetComponent<SpriteRenderer>().sprite = e.CandyOnGridCell.GetCandyBlockSo().defaultCandySprite; 
         candyGridVisualTransform.GetChild(0).GetComponent<SpriteRenderer>().sortingOrder = e.CandyGridCellPosition.GetY();
         CandyGridVisual candyGridVisual = new CandyGridVisual(candyGridVisualTransform, e.CandyOnGridCell,gridLogicSystem);
         _candyGridDictionary[e.CandyOnGridCell] = candyGridVisual;
     }
-
-    private void Update()
-    {
-        if (!_isSetup) { return; }
-        UpdateVisual();
-
-        switch (_state)
-        {
-            case State.Busy:
-                _busyTimer -= Time.deltaTime;
-                if (_busyTimer <= 0f)
-                {
-                    _onBusyTimerElapsedAction();
-                }
-                break;
-            case State.BeforePlayerTurn:
-                
-                if (Input.GetMouseButtonDown(0))
-                {   //List<List<CandyGridCellPosition>> allSameColorConnectedGroups = gridLogicSystem.GetAllConnectedGroups();
-                    List<GridLogicSystem.PossibleMove> allPossibleMoves = gridLogicSystem.GetAllPossibleMoves();
-                    if (!gridLogicSystem.IsAnyPossibleMoveLeft(allPossibleMoves))
-                    {
-                        gridLogicSystem.DestroyAllCandyBlocks();
-                        SetBusyState(.1f, () => SetState(State.AfterPlayerTurn));
-                    }
-                    Vector3 mousePosition = Input.mousePosition;
-                    mousePosition.z = 60f;
-                    Vector3 worldPosition = Camera.main.ScreenToWorldPoint(mousePosition);
-                    _grid.GetXY(worldPosition, out int x, out int y);
-                    if (gridLogicSystem.HasAnyConnectedSameColorCandyBlocks(x,y))
-                    {   gridLogicSystem.DestroyConnectedSameColorCandyBlocks(x,y);
-                        SetState(State.AfterPlayerTurn);
-                    }
-
-                }
-                break;
-            case State.AfterPlayerTurn:
-                SetBusyState(.2f, () =>
-                {
-                    gridLogicSystem.FallGemsIntoEmptyPosition();
-                    
-                    SetBusyState(.2f, () =>
-                    {
-                        gridLogicSystem.SpawnNewMissingGridPositions();
-                        SetBusyState(.4f, () =>
-                        {   
-                            gridLogicSystem.ChangeAllCandyBlocksState();
-                            SetBusyState(.1f, ()=>SetState(State.BeforePlayerTurn));
-                        });
-                    });
-                });
-                
-                
-                break;
-            
-            case State.GameOver:
-                break;
-        }
-        
-    }
-
-    private void UpdateVisual()
+    public void UpdateVisual()
     {
         foreach (CandyOnGridCell candyGrid in _candyGridDictionary.Keys)
         {
@@ -175,31 +94,12 @@ public class GridVisualSystem : MonoBehaviour
         }
         
     }
-
-    private void SetBusyState(float busyTimer, Action onBusyTimerElapsedAction) {
-        SetState(State.Busy);
-        this._busyTimer = busyTimer;
-        this._onBusyTimerElapsedAction = onBusyTimerElapsedAction;
-        
-    }
-    private void SetState(State state) {
-        this._state = state;
-        OnStateChanged?.Invoke(this, EventArgs.Empty);
-    }
-    public State GetState() {
-        return _state;
-    }
-
-    
-
     private class CandyGridVisual
     {
         private Transform _transform;
         private CandyOnGridCell _candyOnGridCell;
         private GridLogicSystem _gridLogicSystem;
         
-        
-
         public CandyGridVisual(Transform transform, CandyOnGridCell candyOnGridCell, GridLogicSystem gridLogicSystem)
         {
             this._transform = transform;
